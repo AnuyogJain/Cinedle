@@ -46,4 +46,10 @@ export function persistUiMode(uiMode: UiMode): void {
 }
 
 /** Inline boot script — keep in sync with lib/appearance.ts */
-export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var k=${JSON.stringify(APPEARANCE_STORAGE_KEY)};var raw=localStorage.getItem(k);var ui=raw==="dark"?"dark":"light";document.documentElement.setAttribute("data-ui-mode",ui);if(ui==="light"){document.documentElement.style.colorScheme="light";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",${JSON.stringify(LIGHT_THEME_COLOR)});}else{document.documentElement.style.colorScheme="dark";}}catch(e){document.documentElement.setAttribute("data-ui-mode",${JSON.stringify(DEFAULT_UI_MODE)});}})();`;
+export const APPEARANCE_BOOT_SCRIPT = `(function(){try{var k=${JSON.stringify(
+  APPEARANCE_STORAGE_KEY
+)};var raw=localStorage.getItem(k);var ui=raw==="dark"?"dark":"light";document.documentElement.setAttribute("data-ui-mode",ui);if(ui==="light"){document.documentElement.style.colorScheme="light";var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",${JSON.stringify(
+  LIGHT_THEME_COLOR
+)});}else{document.documentElement.style.colorScheme="dark";}}catch(e){document.documentElement.setAttribute("data-ui-mode",${JSON.stringify(
+  DEFAULT_UI_MODE
+)});}})();`;
