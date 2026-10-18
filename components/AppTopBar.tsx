@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AppearanceToggle } from "./AppearanceToggle";
+import { CineswipeHeaderButton } from "./CineswipeHeaderButton";
 import { BrandTitle } from "./BrandTitle";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,7 @@ export function AppTopBar({
 
         <div className="flex min-h-10 items-center justify-end gap-1">
           {trailing}
+          <CineswipeHeaderButton />
           <AppearanceToggle />
         </div>
       </div>

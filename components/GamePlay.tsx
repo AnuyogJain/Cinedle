@@ -71,6 +71,7 @@ export function GamePlay({
     displayTitle: string;
     year: number;
     posterPath: string | null;
+    tmdbId: number | null;
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const [shake, setShake] = useState(false);
@@ -121,6 +122,7 @@ export function GamePlay({
             displayTitle: local.revealTitle,
             year: local.revealYear ?? 0,
             posterPath: null,
+            tmdbId: null,
           });
 
           const last = local.guesses[local.guesses.length - 1];
@@ -180,6 +182,7 @@ export function GamePlay({
         displayTitle: string;
         year: number;
         posterPath: string | null;
+        tmdbId?: number | null;
       }
     ) => {
       const guesses: StoredGuessRow[] = rows.map((r) => ({
@@ -402,6 +405,7 @@ export function GamePlay({
         title={reveal?.displayTitle ?? ""}
         year={reveal?.year ?? 0}
         posterPath={reveal?.posterPath ?? null}
+        tmdbId={reveal?.tmdbId ?? null}
         onClose={() => setReveal(null)}
       />
     </div>

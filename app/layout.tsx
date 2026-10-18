@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Oswald } from "next/font/google";
+import { CineswipeAppUrlProvider } from "@/components/CineswipeAppUrlProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { APPEARANCE_BOOT_SCRIPT, LIGHT_THEME_COLOR } from "@/lib/appearance";
+import { getCineswipeAppUrl } from "@/lib/cineswipe";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,6 +37,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const cineswipeAppUrl = getCineswipeAppUrl();
+
   return (
     <html
       lang="en"
@@ -46,7 +50,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_BOOT_SCRIPT }} />
       </head>
       <body className="min-h-dvh bg-background text-foreground">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <CineswipeAppUrlProvider appUrl={cineswipeAppUrl}>
+            {children}
+          </CineswipeAppUrlProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
