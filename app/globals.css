@@ -1,10 +1,9 @@
 @import "tailwindcss";
+@plugin "tailwindcss-animate";
 
 :root {
   --imdb-yellow: #f5c518;
-}
-
-[data-theme="dark-midnight"] {
+  --radius: 0.75rem;
   color-scheme: dark;
   --background: #0a0a0f;
   --foreground: #f4f4f5;
@@ -12,10 +11,30 @@
   --foreground-subtle: rgb(244 244 245 / 0.44);
   --surface: rgb(255 255 255 / 0.05);
   --surface-hover: rgb(255 255 255 / 0.1);
-  --border: rgb(255 255 255 / 0.1);
   --body-gradient: radial-gradient(circle at top, #1a1024 0%, #0a0a0f 45%, #050508 100%);
+
+  --card: rgb(18 18 24 / 0.72);
+  --card-foreground: #f4f4f5;
+  --popover: rgb(18 18 24 / 0.95);
+  --popover-foreground: #f4f4f5;
+  --primary: #f5c518;
+  --primary-foreground: #0a0a0f;
+  --primary-glow: rgb(245 197 24 / 0.45);
+  --secondary: rgb(255 255 255 / 0.08);
+  --secondary-foreground: #f4f4f5;
+  --muted: rgb(244 244 245 / 0.68);
+  --muted-foreground: rgb(244 244 245 / 0.55);
   --accent: #fb7185;
-  --accent-text: #fecdd3;
+  --accent-foreground: #fecdd3;
+  --accent-soft: rgb(251 113 133 / 0.18);
+  --destructive: #ef4444;
+  --destructive-foreground: #fef2f2;
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.08);
+  --ring: rgb(245 197 24 / 0.55);
+  --gold: #f5c518;
+  --glass: rgb(255 255 255 / 0.04);
+
   --tile-empty: rgb(255 255 255 / 0.04);
   --tile-empty-border: rgb(167 139 250 / 0.28);
   --tile-filled: rgb(255 255 255 / 0.14);
@@ -30,67 +49,35 @@
   --keyboard-key-absent-text: rgb(255 255 255 / 0.28);
 }
 
-[data-theme="dark-oled"] {
-  color-scheme: dark;
-  --background: #000000;
-  --foreground: #fafafa;
-  --foreground-muted: rgb(250 250 250 / 0.66);
-  --foreground-subtle: rgb(250 250 250 / 0.42);
-  --surface: rgb(255 255 255 / 0.06);
-  --surface-hover: rgb(255 255 255 / 0.11);
-  --border: rgb(255 255 255 / 0.12);
-  --body-gradient: radial-gradient(circle at top, #111111 0%, #000000 55%, #000000 100%);
-  --accent: #f43f5e;
-  --accent-text: #fda4af;
-  --tile-empty: rgb(255 255 255 / 0.03);
-  --tile-empty-border: rgb(255 255 255 / 0.14);
-  --tile-filled: rgb(255 255 255 / 0.12);
-  --tile-filled-border: rgb(255 255 255 / 0.55);
-  --tile-correct: #22c55e;
-  --tile-present: #eab308;
-  --tile-elsewhere: #a855f7;
-  --tile-absent: rgb(10 10 10 / 0.95);
-  --keyboard-key: rgb(63 63 70 / 0.95);
-  --keyboard-key-text: #fafafa;
-  --keyboard-key-absent: rgb(18 18 18 / 0.98);
-  --keyboard-key-absent-text: rgb(255 255 255 / 0.25);
-}
-
-[data-theme="dark-amethyst"] {
-  color-scheme: dark;
-  --background: #140820;
-  --foreground: #f5f3ff;
-  --foreground-muted: rgb(245 243 255 / 0.68);
-  --foreground-subtle: rgb(245 243 255 / 0.44);
-  --surface: rgb(255 255 255 / 0.06);
-  --surface-hover: rgb(255 255 255 / 0.1);
-  --border: rgb(255 255 255 / 0.1);
-  --body-gradient: radial-gradient(circle at top, #2e1065 0%, #140820 50%, #0a0412 100%);
-  --accent: #e879f9;
-  --accent-text: #f5d0fe;
-  --tile-empty: rgb(255 255 255 / 0.04);
-  --tile-empty-border: rgb(192 132 252 / 0.3);
-  --tile-filled: rgb(255 255 255 / 0.13);
-  --tile-filled-border: rgb(216 180 254 / 0.95);
-  --tile-correct: #22c55e;
-  --tile-present: #eab308;
-  --tile-elsewhere: #c084fc;
-  --tile-absent: rgb(30 15 45 / 0.95);
-  --keyboard-key: rgb(88 28 135 / 0.9);
-  --keyboard-key-text: #fafafa;
-  --keyboard-key-absent: rgb(30 15 45 / 0.98);
-  --keyboard-key-absent-text: rgb(255 255 255 / 0.28);
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--foreground-muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-subtle: var(--foreground-subtle);
   --color-surface: var(--surface);
-  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
-  --color-accent-text: var(--accent-text);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-text: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-glass: var(--glass);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --font-display: var(--font-oswald), var(--font-geist-sans), system-ui, sans-serif;
 }
 
 body {
@@ -99,9 +86,20 @@ body {
   min-height: 100dvh;
 }
 
-.app-panel {
-  background: var(--surface);
+.font-display {
+  font-family: var(--font-display);
+}
+
+.glass-panel {
+  background: var(--card);
   border: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.app-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
 }
 
 .app-input {
@@ -111,12 +109,12 @@ body {
 }
 
 .btn-primary {
-  background: var(--keyboard-key);
-  color: var(--keyboard-key-text);
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 .btn-ghost {
-  background: var(--surface);
+  background: var(--secondary);
   border: 1px solid var(--border);
   color: var(--foreground);
 }
@@ -205,4 +203,16 @@ body {
 
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
+}
+
+.poster-card-gradient-1 {
+  background: linear-gradient(145deg, #7c3aed 0%, #1e1b4b 55%, #0a0a0f 100%);
+}
+
+.poster-card-gradient-2 {
+  background: linear-gradient(160deg, #f5c518 0%, #ea580c 40%, #831843 100%);
+}
+
+.poster-card-gradient-3 {
+  background: linear-gradient(135deg, #0891b2 0%, #312e81 50%, #140820 100%);
 }

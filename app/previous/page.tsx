@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AppTopBar } from "@/components/AppTopBar";
 import { PageFrame, PageTitle } from "@/components/PageFrame";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { readLocalProgress } from "@/lib/progress-local";
 import { dailyPuzzleKey, puzzleKeyToSlug } from "@/lib/puzzle-key-url";
 import { utcDateString } from "@/lib/dates";
+import { cn } from "@/lib/utils";
 
 function daysInMonth(year: number, month: number): number {
   return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
@@ -41,68 +43,75 @@ export default function PreviousPage() {
 
   return (
     <PageFrame>
-      <AppTopBar backHref="/" trailing={<ThemeSwitcher />} />
+      <AppTopBar backHref="/" />
 
       <main className="flex-1 py-6">
         <PageTitle description="Replay past daily puzzles. Green days are solved on this device.">
           Previous games
         </PageTitle>
 
-        <div className="mb-4 flex items-center justify-between">
-          <button
-            type="button"
-            className="btn-ghost rounded-lg px-3 py-1 text-sm"
-            onClick={() => shiftMonth(-1)}
-          >
-            ‹
-          </button>
-          <span className="text-sm text-muted">
-            {new Date(Date.UTC(year, month, 1)).toLocaleString("en-US", {
-              month: "long",
-              year: "numeric",
-              timeZone: "UTC",
-            })}
-          </span>
-          <button
-            type="button"
-            className="btn-ghost rounded-lg px-3 py-1 text-sm"
-            onClick={() => shiftMonth(1)}
-          >
-            ›
-          </button>
-        </div>
-
-        <div className="grid grid-cols-7 gap-1 text-center text-xs text-subtle">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-            <div key={d}>{d}</div>
-          ))}
-        </div>
-
-        <div className="mt-1 grid grid-cols-7 gap-1">
-          {cells.map((cell, i) => {
-            if (!cell) return <div key={`e-${i}`} />;
-            const key = dailyPuzzleKey(cell.date);
-            const done = progress[key]?.solved;
-            const isFuture = cell.date > today;
-            const slug = puzzleKeyToSlug(key);
-            return (
-              <Link
-                key={cell.date}
-                href={isFuture ? "#" : `/play/${slug}`}
-                aria-disabled={isFuture}
-                className={`flex h-10 items-center justify-center rounded-lg text-sm ${
-                  isFuture
-                    ? "pointer-events-none opacity-30"
-                    : done
-                      ? "bg-emerald-500/25 font-semibold text-emerald-200"
-                      : "btn-ghost"
-                }`}
+        <Card className="border-border/50 bg-card/60">
+          <CardContent className="pt-6">
+            <div className="mb-4 flex items-center justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => shiftMonth(-1)}
               >
-                {cell.day}
-              </Link>
-            );
-          })}
-        </div>
+                ‹
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                {new Date(Date.UTC(year, month, 1)).toLocaleString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => shiftMonth(1)}
+              >
+                ›
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 text-center text-xs text-subtle">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                <div key={d}>{d}</div>
+              ))}
+            </div>
+
+            <div className="mt-1 grid grid-cols-7 gap-1">
+              {cells.map((cell, i) => {
+                if (!cell) return <div key={`e-${i}`} />;
+                const key = dailyPuzzleKey(cell.date);
+                const done = progress[key]?.solved;
+                const isFuture = cell.date > today;
+                const slug = puzzleKeyToSlug(key);
+                return (
+                  <Link
+                    key={cell.date}
+                    href={isFuture ? "#" : `/play/${slug}`}
+                    aria-disabled={isFuture}
+                    className={cn(
+                      "flex h-10 items-center justify-center rounded-lg border text-sm transition",
+                      isFuture
+                        ? "pointer-events-none border-transparent opacity-30"
+                        : done
+                          ? "border-emerald-500/40 bg-emerald-500/25 font-semibold text-emerald-200"
+                          : "border-border bg-secondary/50 hover:bg-secondary",
+                    )}
+                  >
+                    {cell.day}
+                  </Link>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </PageFrame>
   );

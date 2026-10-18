@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import { THEME_BOOT_SCRIPT } from "@/lib/theme";
+import { Geist, Geist_Mono, Oswald } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +12,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const oswald = Oswald({
+  variable: "--font-oswald",
+  subsets: ["latin"],
+  weight: "variable",
+});
+
 export const metadata: Metadata = {
   title: "Cinedle",
   applicationName: "Cinedle",
-  description: "Daily movie title puzzle",
+  description: "Daily movie title puzzle — cinema-themed Wordle for film buffs",
 };
 
 export const viewport: Viewport = {
@@ -32,17 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      suppressHydrationWarning
-      data-theme="dark-midnight"
-      data-theme-family="dark"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-      </head>
-      <body className="min-h-dvh bg-background text-foreground">
-        <ThemeProvider>{children}</ThemeProvider>
-      </body>
+      <body className="min-h-dvh bg-background text-foreground">{children}</body>
     </html>
   );
 }

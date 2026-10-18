@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { BrandTitle } from "./BrandTitle";
+import { cn } from "@/lib/utils";
 
 const sideSlot =
   "flex min-h-10 min-w-10 shrink-0 items-center justify-center";
@@ -18,25 +21,32 @@ export function AppTopBar({
   trailing?: ReactNode;
 }) {
   return (
-    <header className="flex shrink-0 items-center justify-between gap-2 border-b border-border/40 bg-background/90 px-2 py-3 backdrop-blur-sm">
-      {backHref ? (
-        <Link
-          href={backHref}
-          className={`${sideSlot} rounded-full text-muted hover:bg-surface-hover`}
-          aria-label="Back"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-      ) : (
-        <div className={sideSlot} aria-hidden />
-      )}
-      <div className="min-w-0 flex-1 text-center">
-        <BrandTitle className="text-lg" />
-        {subtitle ? (
-          <p className="truncate text-xs text-subtle">{subtitle}</p>
-        ) : null}
+    <header className="glass-panel sticky top-0 z-20 -mx-4 mb-1 shrink-0 border-x-0 border-t-0 px-2 py-3 shadow-lg shadow-black/20">
+      <div className="flex items-center justify-between gap-2">
+        {backHref ? (
+          <Button variant="ghost" size="icon" className="shrink-0" asChild>
+            <Link href={backHref} aria-label="Back">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+        ) : (
+          <div className={sideSlot} aria-hidden />
+        )}
+        <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-1">
+          <BrandTitle className="text-lg leading-none" />
+          {subtitle ? (
+            <Badge
+              variant="gold"
+              className="max-w-full truncate px-2.5 py-0.5 text-[11px] font-medium normal-case tracking-normal"
+            >
+              {subtitle}
+            </Badge>
+          ) : null}
+        </div>
+        <div className={cn(sideSlot, "justify-end")}>
+          {trailing ?? <span aria-hidden />}
+        </div>
       </div>
-      <div className={`${sideSlot} justify-end`}>{trailing ?? <span aria-hidden />}</div>
     </header>
   );
 }

@@ -4,9 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppTopBar } from "@/components/AppTopBar";
 import { PageFrame, PageTitle } from "@/components/PageFrame";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { COUNTRY_OPTIONS, TMDB_GENRES } from "@/lib/genres";
 import { unlimitedPuzzleKey, puzzleKeyToSlug } from "@/lib/puzzle-key-url";
+import { cn } from "@/lib/utils";
 
 export default function UnlimitedPage() {
   const router = useRouter();
@@ -32,37 +35,46 @@ export default function UnlimitedPage() {
 
   return (
     <PageFrame>
-      <AppTopBar backHref="/" trailing={<ThemeSwitcher />} />
+      <AppTopBar backHref="/" />
 
       <main className="flex-1 py-6">
         <PageTitle description="Random movie titles with optional filters. Same rules as daily play.">
           Unlimited
         </PageTitle>
 
-        <section className="mb-6">
-          <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-subtle">
-            Genres
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {TMDB_GENRES.map((g) => {
-              const active = genreIds.includes(g.id);
-              return (
-                <button
-                  key={g.id}
-                  type="button"
-                  onClick={() => toggleGenre(g.id)}
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    active
-                      ? "bg-accent-soft text-accent-text ring-1 ring-accent/40"
-                      : "btn-ghost"
-                  }`}
-                >
-                  {g.name}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+        <Card className="mb-6 border-border/50 bg-card/60">
+          <CardContent className="pt-6">
+            <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-subtle">
+              Genres
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {TMDB_GENRES.map((g) => {
+                const active = genreIds.includes(g.id);
+                return (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => toggleGenre(g.id)}
+                    className={cn(
+                      "rounded-full transition",
+                      active ? "" : "opacity-90",
+                    )}
+                  >
+                    <Badge
+                      variant={active ? "default" : "secondary"}
+                      className={cn(
+                        "cursor-pointer px-3 py-1 text-xs",
+                        active && "bg-primary text-primary-foreground",
+                      )}
+                    >
+                      {g.name}
+                    </Badge>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         <section className="mb-8">
           <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-subtle">
@@ -82,13 +94,9 @@ export default function UnlimitedPage() {
           </select>
         </section>
 
-        <button
-          type="button"
-          onClick={start}
-          className="btn-primary w-full rounded-2xl py-3 text-sm font-semibold"
-        >
+        <Button variant="cinema" size="lg" className="w-full" onClick={start}>
           Start puzzle
-        </button>
+        </Button>
       </main>
     </PageFrame>
   );

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { BrandTitle } from "@/components/BrandTitle";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { readLocalProgress, type ProgressMap } from "@/lib/progress-local";
 
 function LoginForm() {
@@ -52,48 +54,61 @@ function LoginForm() {
     <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
       <div className="text-center">
         <BrandTitle className="text-2xl" />
-        <p className="mt-2 text-sm text-muted">Sign in to sync progress</p>
+        <p className="mt-2 text-sm text-muted-foreground">Sign in to sync progress</p>
       </div>
 
-      <form onSubmit={submit} className="app-panel space-y-4 rounded-2xl p-4">
-        {error ? <p className="text-sm text-rose-300">{error}</p> : null}
-        <div className="space-y-2">
-          <label className="text-xs text-subtle" htmlFor="username">
-            Username
-          </label>
-          <input
-            id="username"
-            autoComplete="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/30"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-xs text-subtle" htmlFor="password">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/30"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={busy}
-          className="btn-primary w-full rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
-        >
-          {busy ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
+      <Card className="border-border/60 bg-card/80 backdrop-blur-md">
+        <CardHeader className="pb-0" />
+        <CardContent>
+          <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs text-subtle" htmlFor="username">
+                Username
+              </label>
+              <input
+                id="username"
+                autoComplete="username"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setError(null);
+                }}
+                className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-subtle" htmlFor="password">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
+                aria-invalid={error != null}
+                aria-describedby={error ? "login-error" : undefined}
+                className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              />
+              {error ? (
+                <p id="login-error" className="text-sm text-rose-300">
+                  {error}
+                </p>
+              ) : null}
+            </div>
+            <Button type="submit" disabled={busy} className="w-full">
+              {busy ? "Signing in…" : "Sign in"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-      <p className="text-center text-sm text-muted">
+      <p className="text-center text-sm text-muted-foreground">
         No account?{" "}
-        <Link href="/register" className="text-accent-text hover:underline">
+        <Link href="/register" className="text-primary hover:underline">
           Register
         </Link>
       </p>

@@ -1,7 +1,14 @@
 "use client";
 
-import { X } from "lucide-react";
 import type { TileState } from "@/lib/grading";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 
 export function HowToPlayModal({
   open,
@@ -10,38 +17,20 @@ export function HowToPlayModal({
   open: boolean;
   onClose: () => void;
 }) {
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
-      role="dialog"
-      aria-modal
-      aria-labelledby="how-to-play-title"
-    >
-      <div className="max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-2xl border border-white/10 bg-zinc-900 p-5 shadow-2xl">
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <h2 id="how-to-play-title" className="text-lg font-semibold">
-            How to play
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="cursor-pointer rounded-lg p-1 text-muted hover:bg-surface-hover"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>How to play</DialogTitle>
+          <DialogDescription>
+            Guess the secret{" "}
+            <strong className="text-foreground">movie title</strong>. The blanks
+            show how many letters are in each word. Use A–Z only—type spaces
+            between words when you submit.
+          </DialogDescription>
+        </DialogHeader>
 
-        <p className="mb-4 text-sm text-muted">
-          Guess the secret{" "}
-          <strong className="text-foreground">movie title</strong>. The blanks
-          show how many letters are in each word. Use A–Z only—type spaces
-          between words when you submit.
-        </p>
-
-        <ul className="mb-5 space-y-2 text-sm text-muted">
+        <ul className="space-y-2 text-sm text-muted-foreground">
           <LegendItem
             state="correct"
             label="Green — correct letter and spot in that word"
@@ -57,7 +46,9 @@ export function HowToPlayModal({
           <LegendItem state="absent" label="Gray — not in the title" />
         </ul>
 
-        <section className="space-y-4 border-t border-white/10 pt-4">
+        <Separator className="bg-border" />
+
+        <section className="space-y-4">
           <ExampleBlock
             scenario='Answer is "To You". You guess the first word:'
             words={[{ letters: "BY", states: ["absent", "elsewhere"] }]}
@@ -82,8 +73,8 @@ export function HowToPlayModal({
             caption="Every letter green — that’s the title."
           />
         </section>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -92,7 +83,7 @@ function LegendItem({ state, label }: { state: TileState; label: string }) {
     <li className="flex items-center gap-2">
       <span
         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold ${tileClass(
-          state
+          state,
         )}`}
         aria-hidden
       >
@@ -139,7 +130,7 @@ function ExampleRow({
             <span
               key={`${w.letters}-${i}`}
               className={`flex h-9 w-9 items-center justify-center rounded-md ${tileClass(
-                w.states[i] ?? "absent"
+                w.states[i] ?? "absent",
               )}`}
             >
               {ch}

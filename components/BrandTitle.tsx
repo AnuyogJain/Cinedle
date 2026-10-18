@@ -1,7 +1,15 @@
+import { cn } from "@/lib/utils";
+
 export function BrandTitle({ className = "" }: { className?: string }) {
   return (
-    <span className={`font-bold tracking-wide ${className}`}>
-      <span className="font-normal text-accent-text">Cine</span>dle
+    <span
+      className={cn(
+        "font-display font-semibold uppercase tracking-wider",
+        className,
+      )}
+    >
+      <span className="text-primary">Cine</span>
+      <span className="text-foreground">dle</span>
     </span>
   );
 }

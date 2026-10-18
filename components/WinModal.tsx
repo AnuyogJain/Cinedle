@@ -1,8 +1,17 @@
 "use client";
 
-import { Clapperboard } from "lucide-react";
+import { Clapperboard, Sparkles, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { posterUrl } from "@/lib/images";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 export function WinModal({
   open,
@@ -25,53 +34,88 @@ export function WinModal({
     if (open) setPosterFailed(false);
   }, [open, posterPath]);
 
-  if (!open) return null;
-
   const poster = posterPath && !posterFailed ? posterUrl(posterPath) : null;
+  const guessLabel = `${guessCount} ${guessCount === 1 ? "guess" : "guesses"}`;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
-      role="dialog"
-      aria-modal
-      aria-labelledby="win-title"
-    >
-      <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-900 p-5 text-center shadow-2xl">
-        <h2 id="win-title" className="text-xl font-semibold">
-          Congrats!
-        </h2>
-        <p className="mt-1 text-sm text-muted">
-          You got it in {guessCount} {guessCount === 1 ? "guess" : "guesses"}.
-        </p>
-
-        <div className="mx-auto mt-4 flex h-44 w-28 items-center justify-center overflow-hidden rounded-lg bg-zinc-800 shadow-lg">
-          {poster ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={poster}
-              alt=""
-              className="h-full w-full object-cover"
-              onError={() => setPosterFailed(true)}
-            />
-          ) : (
-            <Clapperboard className="h-12 w-12 text-subtle" aria-hidden />
-          )}
+    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+      <DialogContent
+        className={cn(
+          "max-w-[min(100vw-2rem,22rem)] gap-0 overflow-hidden border-primary/25 p-0",
+          "shadow-[0_0_0_1px_rgb(245_197_24/0.12),0_24px_80px_rgb(0_0_0/0.55)]",
+        )}
+      >
+        <div className="relative border-b border-border/50 bg-gradient-to-b from-primary/10 via-transparent to-transparent px-6 pb-5 pt-8 text-center">
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent"
+            aria-hidden
+          />
+          <Badge
+            variant="gold"
+            className="mb-3 gap-1 border-primary/40 px-2.5 py-0.5 normal-case tracking-normal"
+          >
+            <Sparkles className="h-3 w-3" aria-hidden />
+            Solved
+          </Badge>
+          <DialogTitle className="text-2xl uppercase">Congrats!</DialogTitle>
+          <DialogDescription className="mt-2 text-muted-foreground">
+            You nailed today&apos;s title in{" "}
+            <span className="font-medium text-foreground">{guessLabel}</span>.
+          </DialogDescription>
         </div>
 
-        <p className="mt-4 select-none text-lg font-medium leading-snug">
-          {title}
-        </p>
-        {year ? (
-          <p className="mt-0.5 select-none text-sm text-subtle">{year}</p>
-        ) : null}
-        <button
-          type="button"
-          onClick={onClose}
-          className="btn-primary mt-6 w-full rounded-xl py-2.5 text-sm font-semibold"
-        >
-          Done
-        </button>
-      </div>
-    </div>
+        <div className="flex flex-col items-center px-6 py-6">
+          <div className="relative">
+            <div
+              className="absolute -inset-3 rounded-2xl bg-primary/15 blur-2xl"
+              aria-hidden
+            />
+            <div className="relative aspect-[2/3] w-36 overflow-hidden rounded-xl border border-primary/25 bg-secondary shadow-2xl shadow-black/50 ring-1 ring-white/10 sm:w-40">
+              {poster ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={poster}
+                  alt={title ? `Poster for ${title}` : ""}
+                  className="h-full w-full object-cover"
+                  onError={() => setPosterFailed(true)}
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-secondary to-background">
+                  <Clapperboard
+                    className="h-14 w-14 text-muted-foreground/70"
+                    aria-hidden
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <h3 className="font-display mt-5 select-none text-center text-xl font-semibold leading-snug tracking-wide text-foreground">
+            {title}
+          </h3>
+
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            {year ? (
+              <Badge variant="outline" className="border-primary/35 font-normal">
+                {year}
+              </Badge>
+            ) : null}
+            <Badge
+              variant="secondary"
+              className="gap-1 font-normal normal-case tracking-normal"
+            >
+              <Trophy className="h-3 w-3 text-primary" aria-hidden />
+              {guessLabel}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="border-t border-border/50 bg-glass/30 px-6 py-4">
+          <Button variant="default" size="lg" className="w-full" onClick={onClose}>
+            Done
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

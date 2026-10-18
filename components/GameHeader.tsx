@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleHelp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { AppTopBar } from "./AppTopBar";
 
 export function GameHeader({
@@ -17,14 +18,15 @@ export function GameHeader({
       backHref={backHref}
       subtitle={subtitle}
       trailing={
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="icon"
           onClick={onHelp}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted hover:bg-surface-hover"
           aria-label="How to play"
         >
           <CircleHelp className="h-5 w-5" />
-        </button>
+        </Button>
       }
     />
   );

@@ -394,7 +394,7 @@ export function GamePlay({
             />
           ) : null}
         </div>
-        <div className="sticky bottom-0 z-10 mt-auto border-t border-border/30 bg-background/95 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        <div className="glass-panel sticky bottom-0 z-10 mt-auto rounded-t-2xl border-x-0 border-b-0 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 shadow-[0_-8px_32px_rgb(0_0_0/0.35)]">
           <GameKeyboard
             letterStates={letterStates}
             onKey={typeLetter}
