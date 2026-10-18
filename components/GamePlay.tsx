@@ -102,20 +102,19 @@ export function GamePlay({
       if (filterQuery.genres) params.set("genres", filterQuery.genres);
       if (filterQuery.country) params.set("country", filterQuery.country);
       const res = await fetch(`/api/puzzle?${params}`);
-      const data = (await res.json()) as {
-        error?: string;
-        code?: PuzzleErrorCode | string;
-      };
+      const data: unknown = await res.json();
       if (!res.ok) {
+        const err = data as { error?: string; code?: PuzzleErrorCode | string };
         setError({
-          message: data.error ?? "Failed to load puzzle",
-          code: data.code,
+          message: err.error ?? "Failed to load puzzle",
+          code: err.code,
         });
         setPuzzle(null);
         return;
       }
-      setPuzzle(data);
-      setDraftGrid(emptyDraftGrid(data.wordLengths));
+      const puzzleData = data as PuzzleView;
+      setPuzzle(puzzleData);
+      setDraftGrid(emptyDraftGrid(puzzleData.wordLengths));
       setActiveWordIndex(0);
       setActiveLetterIndex(0);
 

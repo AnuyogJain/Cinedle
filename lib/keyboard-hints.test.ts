@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { letterCountsInAnswer, mergeKeyboardHints } from "./keyboard-hints";
+import type { TileState } from "./grading";
+import {
+  letterCountsInAnswer,
+  mergeKeyboardHints,
+  type GuessSubmission,
+} from "./keyboard-hints";
 
 describe("mergeKeyboardHints", () => {
   const counts = letterCountsInAnswer(["TO", "O", "OK"]);
@@ -48,20 +53,20 @@ describe("mergeKeyboardHints", () => {
 
   it("keeps green when later guesses also mark the letter yellow", () => {
     const counts = letterCountsInAnswer(["CC", "AB"]);
-    const submissions = [
+    const submissions: GuessSubmission[] = [
       {
         words: ["CC", "AB"],
         states: [
           ["correct", "absent"],
           ["absent", "absent"],
-        ],
+        ] as TileState[][],
       },
       {
         words: ["XX", "XC"],
         states: [
           ["absent", "absent"],
           ["absent", "present"],
-        ],
+        ] as TileState[][],
       },
     ];
     assert.equal(mergeKeyboardHints(counts, [submissions[0]]).get("C"), "correct");
