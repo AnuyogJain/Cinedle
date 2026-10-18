@@ -17,7 +17,12 @@ import {
   getLocalProgress,
   upsertLocalProgress,
   type StoredGuessRow,
+  type StoredProgress,
 } from "@/lib/progress-local";
+import {
+  persistEntryToServer,
+  pullServerProgressIntoLocal,
+} from "@/lib/progress-remote-sync";
 import { GameHeader } from "./GameHeader";
 import { mergeKeyboardHints } from "@/lib/keyboard-hints";
 import { GameKeyboard } from "./GameKeyboard";
@@ -89,6 +94,8 @@ export function GamePlay({
     setLoading(true);
     setError(null);
     try {
+      await pullServerProgressIntoLocal();
+
       const params = new URLSearchParams({ key: puzzleKey });
       if (filterQuery.genres) params.set("genres", filterQuery.genres);
       if (filterQuery.country) params.set("country", filterQuery.country);
@@ -179,7 +186,7 @@ export function GamePlay({
         words: r.words,
         states: r.states,
       }));
-      upsertLocalProgress({
+      const entry: StoredProgress = {
         puzzleKey,
         mode: puzzle?.mode ?? "daily",
         solved,
@@ -189,25 +196,9 @@ export function GamePlay({
         updatedAt: new Date().toISOString(),
         revealTitle: revealData?.displayTitle,
         revealYear: revealData?.year,
-      });
-
-      void fetch("/api/progress", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          entry: {
-            puzzleKey,
-            mode: puzzle?.mode ?? "daily",
-            solved,
-            guessCount: rows.length,
-            guesses,
-            completedAt: solved ? new Date().toISOString() : null,
-            updatedAt: new Date().toISOString(),
-            revealTitle: revealData?.displayTitle,
-            revealYear: revealData?.year,
-          },
-        }),
-      }).catch(() => null);
+      };
+      upsertLocalProgress(entry);
+      void persistEntryToServer(entry);
     },
     [puzzle?.mode, puzzleKey]
   );

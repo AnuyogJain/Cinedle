@@ -51,6 +51,7 @@ export async function POST(request: Request) {
 
     const states = gradeGuess(puzzle.answerWords, guessWords);
     const won = guessMatchesAnswer(guessWords, puzzle.answerWords);
+    const reveal = won ? await revealPuzzleAsync(puzzle) : null;
 
     const user = await getSessionUser();
     if (user && parsed.data.guessesJson) {
@@ -64,6 +65,8 @@ export async function POST(request: Request) {
           guesses,
           completedAt: won ? new Date().toISOString() : null,
           updatedAt: new Date().toISOString(),
+          revealTitle: reveal?.displayTitle,
+          revealYear: reveal?.year,
         };
         await saveProgressForUser(
           user.id,
@@ -73,8 +76,6 @@ export async function POST(request: Request) {
         /* ignore malformed sync payload */
       }
     }
-
-    const reveal = won ? await revealPuzzleAsync(puzzle) : null;
 
     return NextResponse.json({
       states,

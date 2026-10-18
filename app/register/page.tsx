@@ -6,7 +6,7 @@ import { useState } from "react";
 import { BrandTitle } from "@/components/BrandTitle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { readLocalProgress } from "@/lib/progress-local";
+import { syncProgressWithServer } from "@/lib/progress-remote-sync";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,14 +35,7 @@ export default function RegisterPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Registration failed");
 
-      const entries = Object.values(readLocalProgress());
-      if (entries.length) {
-        await fetch("/api/progress", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ entries }),
-        }).catch(() => null);
-      }
+      await syncProgressWithServer();
 
       router.replace("/");
       router.refresh();

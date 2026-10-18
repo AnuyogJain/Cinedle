@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppTopBar } from "@/components/AppTopBar";
 import { PageFrame, PageTitle } from "@/components/PageFrame";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { readLocalProgress } from "@/lib/progress-local";
+import { readLocalProgress, type ProgressMap } from "@/lib/progress-local";
+import { pullServerProgressIntoLocal } from "@/lib/progress-remote-sync";
 import { dailyPuzzleKey, puzzleKeyToSlug } from "@/lib/puzzle-key-url";
 import { utcDateString } from "@/lib/dates";
 import { cn } from "@/lib/utils";
@@ -16,11 +17,21 @@ function daysInMonth(year: number, month: number): number {
 }
 
 export default function PreviousPage() {
-  const today = utcDateString();
-  const [year, setYear] = useState(() => Number(today.slice(0, 4)));
-  const [month, setMonth] = useState(() => Number(today.slice(5, 7)) - 1);
+  const [today, setToday] = useState<string | null>(null);
+  const [year, setYear] = useState(() =>
+    Number(utcDateString().slice(0, 4)),
+  );
+  const [month, setMonth] = useState(() =>
+    Number(utcDateString().slice(5, 7)) - 1,
+  );
+  const [progress, setProgress] = useState<ProgressMap>({});
 
-  const progress = useMemo(() => readLocalProgress(), []);
+  useEffect(() => {
+    setToday(utcDateString());
+    void pullServerProgressIntoLocal().then(() =>
+      setProgress(readLocalProgress()),
+    );
+  }, []);
 
   const cells = useMemo(() => {
     const firstDow = new Date(Date.UTC(year, month, 1)).getUTCDay();
@@ -86,25 +97,30 @@ export default function PreviousPage() {
 
             <div className="mt-1 grid grid-cols-7 gap-1">
               {cells.map((cell, i) => {
-                if (!cell) return <div key={`e-${i}`} />;
+                if (!cell) return <div key={`e-${i}`} aria-hidden />;
                 const key = dailyPuzzleKey(cell.date);
                 const done = progress[key]?.solved;
-                const isFuture = cell.date > today;
+                const isFuture = today != null && cell.date > today;
                 const slug = puzzleKeyToSlug(key);
+                const dayClass = cn(
+                  "flex h-10 items-center justify-center rounded-lg border text-sm transition",
+                  isFuture
+                    ? "pointer-events-none border-border/30 text-muted-foreground opacity-40"
+                    : done
+                      ? "calendar-day--solved"
+                      : "calendar-day--open border-border bg-secondary/50 hover:bg-secondary",
+                );
+
+                if (isFuture) {
+                  return (
+                    <div key={cell.date} className={dayClass} aria-hidden>
+                      {cell.day}
+                    </div>
+                  );
+                }
+
                 return (
-                  <Link
-                    key={cell.date}
-                    href={isFuture ? "#" : `/play/${slug}`}
-                    aria-disabled={isFuture}
-                    className={cn(
-                      "flex h-10 items-center justify-center rounded-lg border text-sm transition",
-                      isFuture
-                        ? "pointer-events-none border-transparent opacity-30"
-                        : done
-                          ? "calendar-day--solved"
-                          : "calendar-day--open border-border bg-secondary/50 hover:bg-secondary",
-                    )}
-                  >
+                  <Link key={cell.date} href={`/play/${slug}`} className={dayClass}>
                     {cell.day}
                   </Link>
                 );

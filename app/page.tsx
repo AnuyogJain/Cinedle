@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { utcDateString } from "@/lib/dates";
-import { readLocalProgress } from "@/lib/progress-local";
+import { readLocalProgress, type ProgressMap } from "@/lib/progress-local";
+import { pullServerProgressIntoLocal } from "@/lib/progress-remote-sync";
 import { dailyPuzzleKey, puzzleKeyToSlug } from "@/lib/puzzle-key-url";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +39,14 @@ function utcWeekDays(
 
 export default function HomePage() {
   const [user, setUser] = useState<{ displayName: string } | null>(null);
+  const [progress, setProgress] = useState<ProgressMap>({});
   const today = utcDateString();
+
+  useEffect(() => {
+    void pullServerProgressIntoLocal().then(() =>
+      setProgress(readLocalProgress()),
+    );
+  }, []);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -48,7 +56,6 @@ export default function HomePage() {
   }, []);
 
   const weekDays = useMemo(() => utcWeekDays(today), [today]);
-  const progress = useMemo(() => readLocalProgress(), []);
   const dailySlug = puzzleKeyToSlug(dailyPuzzleKey(today));
 
   return (

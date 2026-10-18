@@ -6,7 +6,7 @@ import { Suspense, useState } from "react";
 import { BrandTitle } from "@/components/BrandTitle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { readLocalProgress, type ProgressMap } from "@/lib/progress-local";
+import { syncProgressWithServer } from "@/lib/progress-remote-sync";
 
 function LoginForm() {
   const router = useRouter();
@@ -16,17 +16,6 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-
-  const syncLocalProgress = async () => {
-    const map: ProgressMap = readLocalProgress();
-    const entries = Object.values(map);
-    if (entries.length === 0) return;
-    await fetch("/api/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ entries }),
-    }).catch(() => null);
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +29,7 @@ function LoginForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Login failed");
-      await syncLocalProgress();
+      await syncProgressWithServer();
       router.replace(next.startsWith("/") ? next : "/");
       router.refresh();
     } catch (err) {

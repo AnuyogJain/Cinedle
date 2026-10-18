@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { pullServerProgressIntoLocal } from "@/lib/progress-remote-sync";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -39,6 +40,7 @@ export default function AccountPage() {
       const res = await fetch("/api/backup/import", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Import failed");
+      await pullServerProgressIntoLocal();
       setMessage("Progress restored from backup.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Import failed");

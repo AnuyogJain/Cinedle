@@ -24,6 +24,8 @@ export async function exportUserBackupCsvAsync(): Promise<string> {
     solved: row.solved ? "1" : "0",
     guess_count: String(row.guessCount),
     guesses_json: row.guessesJson,
+    reveal_title: row.revealTitle ?? "",
+    reveal_year: row.revealYear != null ? String(row.revealYear) : "",
     completed_at: row.completedAt?.toISOString?.() ?? "",
     updated_at: row.updatedAt?.toISOString?.() ?? "",
   }));
@@ -59,6 +61,7 @@ export async function importUserBackupCsvReplace(csvText: string): Promise<void>
     const puzzleKey = row.puzzle_key?.trim();
     if (!puzzleKey) continue;
     const mode = row.mode === "unlimited" ? "unlimited" : "daily";
+    const revealYearRaw = row.reveal_year?.trim();
     await db.insert(gameProgress).values({
       userId,
       puzzleKey,
@@ -66,6 +69,8 @@ export async function importUserBackupCsvReplace(csvText: string): Promise<void>
       solved: row.solved === "1",
       guessCount: row.guess_count ? Number(row.guess_count) : 0,
       guessesJson: row.guesses_json || "[]",
+      revealTitle: row.reveal_title?.trim() || null,
+      revealYear: revealYearRaw ? Number(revealYearRaw) : null,
       completedAt: row.completed_at ? new Date(row.completed_at) : null,
       updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
     });
