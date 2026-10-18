@@ -6,11 +6,14 @@ Expresso-style daily **movie title** puzzle. Same UTC daily title for everyone, 
 
 1. `npm install`
 2. Copy `env.example` to `.env.local` and set:
-   - `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` (required — puzzle pool, auth, sync)
-   - `TMDB_API_KEY` (required for `pool:refresh` to 3000+ titles; optional for win posters & unlimited TMDB fallback)
-3. `npm run db:push` — apply schema (includes `puzzle_pool_movies`)
-4. `npm run pool:refresh` — fill Turso from TMDB Discover (target **3000** eligible titles), or `npm run pool:import` to seed from `data/puzzle-pool.json` first
-5. `npm run dev` → [http://localhost:3000](http://localhost:3000)
+   - `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` (required — assignments, auth, sync)
+   - `TMDB_API_KEY` (required — first open of each daily/unlimited puzzle fetches from TMDB)
+3. `npm run db:push` — apply schema (`puzzle_assignments`, etc.)
+4. `npm run dev` → [http://localhost:3000](http://localhost:3000)
+
+Puzzles are assigned on first load (daily date or unlimited link) and stored in Turso. No bulk pool seed step.
+
+**Fresh deploy:** `npm run db:reset` then `npm run db:push` (wipes users, progress, and legacy pool data).
 
 ## Scripts
 
@@ -20,14 +23,13 @@ Expresso-style daily **movie title** puzzle. Same UTC daily title for everyone, 
 | `npm run build` | Production build |
 | `npm test` | Grading unit tests |
 | `npm run db:push` | Apply schema to Turso |
-| `npm run pool:refresh` | Upsert puzzle pool in Turso from TMDB (≥3000 titles) |
-| `npm run pool:import` | Import `data/puzzle-pool.json` into Turso (bootstrap) |
+| `npm run db:reset` | Clear app tables + drop legacy pool table |
 
 ## Game rules
 
 - Guess a phrase matching the shown word lengths (letters A–Z).
 - **Green** — correct letter & position. **Yellow** — in that word, wrong spot. **Purple** — in the title, different word.
-- Answers are multi-word movie titles without `:`, commas, or digits.
+- Answers are movie titles without `:`, commas, or digits in the TMDB display name.
 
 ## Backup
 

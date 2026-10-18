@@ -7,6 +7,7 @@ import { PageFrame, PageTitle } from "@/components/PageFrame";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { SingleSelectDropdown } from "@/components/SingleSelectDropdown";
 import { COUNTRY_OPTIONS, TMDB_GENRES } from "@/lib/genres";
 import { unlimitedPuzzleKey, puzzleKeyToSlug } from "@/lib/puzzle-key-url";
 import { cn } from "@/lib/utils";
@@ -56,7 +57,7 @@ export default function UnlimitedPage() {
                     type="button"
                     onClick={() => toggleGenre(g.id)}
                     className={cn(
-                      "rounded-full transition",
+                      "cursor-pointer rounded-full transition",
                       active ? "" : "opacity-90",
                     )}
                   >
@@ -77,24 +78,22 @@ export default function UnlimitedPage() {
         </Card>
 
         <section className="mb-8">
-          <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-subtle">
-            Country
-          </label>
-          <select
+          <SingleSelectDropdown
+            label="Country"
             value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="app-input w-full rounded-xl border px-3 py-2 text-sm"
-          >
-            <option value="">Any</option>
-            {COUNTRY_OPTIONS.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            emptyValue=""
+            onChange={setCountry}
+            options={[
+              { value: "", label: "Any" },
+              ...COUNTRY_OPTIONS.map((c) => ({
+                value: c.code,
+                label: c.name,
+              })),
+            ]}
+          />
         </section>
 
-        <Button variant="cinema" size="lg" className="w-full" onClick={start}>
+        <Button variant="default" size="lg" className="btn-cta w-full" onClick={start}>
           Start puzzle
         </Button>
       </main>

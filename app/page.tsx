@@ -82,10 +82,10 @@ export default function HomePage() {
                     className={cn(
                       "flex flex-col items-center rounded-xl px-0.5 py-2 transition",
                       isToday &&
-                        "bg-primary/15 ring-1 ring-primary/35 shadow-[0_0_20px_-6px_var(--primary-glow)]",
+                        "home-day--today bg-primary/15 ring-1 ring-primary/35 shadow-[0_0_20px_-6px_var(--primary-glow)]",
                       !isToday && !isFuture && "hover:bg-secondary/60",
                       isFuture && "opacity-35",
-                      solved && !isToday && "text-emerald-300/90"
+                      solved && !isToday && "home-day--solved"
                     )}
                   >
                     <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -157,12 +157,15 @@ export default function HomePage() {
         {user ? (
           <Link
             href="/account"
-            className="text-sm text-primary hover:underline"
+            className="auth-link text-sm font-medium underline underline-offset-2"
           >
             Account · {user.displayName}
           </Link>
         ) : (
-          <Link href="/login" className="text-sm text-primary hover:underline">
+          <Link
+            href="/login"
+            className="auth-link text-sm font-medium underline underline-offset-2"
+          >
             Login
           </Link>
         )}

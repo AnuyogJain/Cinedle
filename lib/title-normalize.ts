@@ -12,9 +12,7 @@ export interface PoolMovie {
 }
 
 export function lettersOnlyUpper(raw: string): string {
-  return raw
-    .toUpperCase()
-    .replace(/[^A-Z]/g, "");
+  return raw.toUpperCase().replace(/[^A-Z]/g, "");
 }
 
 export function titleToPlayWords(displayTitle: string): string[] {
@@ -33,7 +31,6 @@ export function wordLengths(words: string[]): number[] {
 export function isEligibleMovieTitle(title: string): boolean {
   if (FORBIDDEN_CHARS.test(title)) return false;
   const words = titleToPlayWords(title);
-  if (words.length < 2) return false;
   if (words.length > MAX_WORDS) return false;
   const total = words.reduce((sum, w) => sum + w.length, 0);
   if (total > MAX_TOTAL_LETTERS) return false;
@@ -43,7 +40,7 @@ export function isEligibleMovieTitle(title: string): boolean {
 
 export function parseGuessIntoWords(
   raw: string,
-  expectedLengths: number[],
+  expectedLengths: number[]
 ): string[] | null {
   const trimmed = raw.trim();
   if (!trimmed) return null;
@@ -62,7 +59,7 @@ export function parseGuessIntoWords(
 
 export function guessMatchesAnswer(
   guessWords: string[],
-  answerWords: string[],
+  answerWords: string[]
 ): boolean {
   if (guessWords.length !== answerWords.length) return false;
   return guessWords.every((w, i) => w === answerWords[i]);

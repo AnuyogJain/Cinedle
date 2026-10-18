@@ -4,13 +4,15 @@ export function publicDbErrorMessage(error: unknown, fallback: string): string {
   if (
     lower.includes("no such table") ||
     lower.includes("not configured") ||
-    lower.includes("turso_database_url") ||
-    lower.includes("puzzle pool is empty")
+    lower.includes("turso_database_url")
   ) {
-    if (lower.includes("puzzle pool is empty")) {
-      return "Puzzle pool is empty. Run npm run pool:refresh (needs TMDB_API_KEY) or npm run pool:import.";
-    }
     return "Database not set up. Add Turso env vars to .env.local and run npm run db:push.";
+  }
+  if (
+    lower.includes("could not assign puzzle") ||
+    lower.includes("tmdb_api_key")
+  ) {
+    return "Could not load puzzle. Set TMDB_API_KEY and try again.";
   }
   if (msg.startsWith("Failed query:")) {
     return "Database unavailable. Confirm Turso credentials and run npm run db:push.";

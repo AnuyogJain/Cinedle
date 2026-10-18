@@ -1,18 +1,14 @@
 import "server-only";
 
-import {
-  buildPickerSeed,
-  filterPool,
-  pickFromPool,
-  type PuzzleFilters,
-} from "./puzzle-picker";
-import { getPuzzlePool } from "./pool-db";
+import { getOrCreateAssignment } from "./puzzle-assignments";
 import {
   titleToPlayWords,
   wordLengths,
   type PoolMovie,
 } from "./title-normalize";
-import { discoverEligibleMovie, fetchMoviePosterPath } from "./tmdb-discover";
+import { fetchMoviePosterPath } from "./tmdb-discover";
+import type { PuzzleFilters } from "./puzzle-picker";
+import { parsePuzzleKey } from "./puzzle-parse";
 
 export interface ResolvedPuzzle {
   puzzleKey: string;
@@ -24,19 +20,6 @@ export interface ResolvedPuzzle {
   displayTitle: string;
   year: number;
   posterPath: string | null;
-}
-
-function parsePuzzleKey(puzzleKey: string): {
-  mode: "daily" | "unlimited";
-  keyPart: string;
-} | null {
-  const idx = puzzleKey.indexOf(":");
-  if (idx <= 0) return null;
-  const mode = puzzleKey.slice(0, idx);
-  const keyPart = puzzleKey.slice(idx + 1);
-  if (mode !== "daily" && mode !== "unlimited") return null;
-  if (!keyPart) return null;
-  return { mode, keyPart };
 }
 
 function movieToPuzzle(
@@ -66,27 +49,11 @@ export async function resolvePuzzle(
   const parsed = parsePuzzleKey(puzzleKey);
   if (!parsed) return null;
 
-  const { mode, keyPart } = parsed;
-  const seed = buildPickerSeed(mode, keyPart, filters);
-  const pool = await getPuzzlePool();
-  let filtered = filterPool(pool, filters);
-
-  if (filtered.length === 0 && mode === "unlimited") {
-    const discovered = await discoverEligibleMovie(seed, filters);
-    if (discovered) {
-      filtered = [discovered];
-    }
-  }
-
-  if (filtered.length === 0) {
-    filtered = pool;
-  }
-
-  const picked = pickFromPool(filtered, seed);
+  const picked = await getOrCreateAssignment(puzzleKey, filters);
   if (!picked) return null;
 
-  const date = mode === "daily" ? keyPart : null;
-  return movieToPuzzle(picked, puzzleKey, mode, date);
+  const date = parsed.mode === "daily" ? parsed.keyPart : null;
+  return movieToPuzzle(picked, puzzleKey, parsed.mode, date);
 }
 
 export { utcDateString } from "./dates";

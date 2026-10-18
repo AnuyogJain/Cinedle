@@ -102,7 +102,7 @@ export default function RegisterPage() {
                   className="app-input w-full rounded-xl border px-3 py-2 text-sm"
                 />
                 {usernameError ? (
-                  <p id="username-error" className="text-sm text-rose-300">
+                  <p id="username-error" className="auth-error text-sm">
                     {usernameError}
                   </p>
                 ) : null}
@@ -127,7 +127,7 @@ export default function RegisterPage() {
                   className="app-input w-full rounded-xl border px-3 py-2 text-sm"
                 />
                 {passwordError ? (
-                  <p id="password-error" className="text-sm text-rose-300">
+                  <p id="password-error" className="auth-error text-sm">
                     {passwordError}
                   </p>
                 ) : null}
@@ -141,7 +141,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have one?{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/login" className="auth-link font-medium underline underline-offset-2">
             Sign in
           </Link>
         </p>

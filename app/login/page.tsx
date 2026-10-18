@@ -73,7 +73,7 @@ function LoginForm() {
                   setUsername(e.target.value);
                   setError(null);
                 }}
-                className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+                className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none"
               />
             </div>
             <div className="space-y-2">
@@ -91,10 +91,10 @@ function LoginForm() {
                 }}
                 aria-invalid={error != null}
                 aria-describedby={error ? "login-error" : undefined}
-                className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+                className="app-input w-full rounded-xl border px-3 py-2 text-sm outline-none"
               />
               {error ? (
-                <p id="login-error" className="text-sm text-rose-300">
+                <p id="login-error" className="auth-error text-sm">
                   {error}
                 </p>
               ) : null}
@@ -108,7 +108,7 @@ function LoginForm() {
 
       <p className="text-center text-sm text-muted-foreground">
         No account?{" "}
-        <Link href="/register" className="text-primary hover:underline">
+        <Link href="/register" className="auth-link font-medium underline underline-offset-2">
           Register
         </Link>
       </p>

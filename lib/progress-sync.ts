@@ -29,6 +29,8 @@ export async function saveProgressForUser(
       solved: entry.solved,
       guessCount: entry.guessCount,
       guessesJson: JSON.stringify(entry.guesses),
+      revealTitle: entry.revealTitle ?? null,
+      revealYear: entry.revealYear ?? null,
       completedAt: entry.completedAt ? new Date(entry.completedAt) : null,
       updatedAt,
     })
@@ -39,6 +41,8 @@ export async function saveProgressForUser(
         solved: entry.solved,
         guessCount: entry.guessCount,
         guessesJson: JSON.stringify(entry.guesses),
+        revealTitle: entry.revealTitle ?? null,
+        revealYear: entry.revealYear ?? null,
         completedAt: entry.completedAt ? new Date(entry.completedAt) : null,
         updatedAt,
       },
@@ -59,6 +63,8 @@ export async function listProgressForUser(userId: string): Promise<StoredProgres
     guesses: JSON.parse(row.guessesJson) as StoredProgress["guesses"],
     completedAt: row.completedAt?.toISOString() ?? null,
     updatedAt: row.updatedAt.toISOString(),
+    revealTitle: row.revealTitle ?? undefined,
+    revealYear: row.revealYear ?? undefined,
   }));
 }
 

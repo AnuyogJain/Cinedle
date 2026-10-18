@@ -43,16 +43,19 @@ export async function fetchMoviePosterPath(
 export async function discoverEligibleMovie(
   seed: string,
   filters: PuzzleFilters,
+  attempt = 0,
 ): Promise<PoolMovie | null> {
   const apiKey = tmdbKey();
   if (!apiKey) return null;
 
-  const page = pickIndex(seed, 50) + 1;
+  const pageSpread = 50 + Math.min(attempt, 12) * 15;
+  const page = pickIndex(seed, pageSpread) + 1;
+  const voteGte = attempt >= 12 ? 50 : attempt >= 6 ? 100 : 200;
   const url = new URL(`${TMDB_BASE}/discover/movie`);
   url.searchParams.set("api_key", apiKey);
   url.searchParams.set("language", "en-US");
   url.searchParams.set("sort_by", "popularity.desc");
-  url.searchParams.set("vote_count.gte", "200");
+  url.searchParams.set("vote_count.gte", String(voteGte));
   url.searchParams.set("page", String(page));
   if (filters.genreIds.length > 0) {
     url.searchParams.set("with_genres", filters.genreIds.join(","));

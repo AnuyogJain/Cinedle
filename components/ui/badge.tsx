@@ -15,7 +15,7 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground",
         outline: "border-border/80 bg-card/30 text-muted-foreground backdrop-blur-sm",
         gold:
-          "border-primary/30 bg-primary/15 text-[var(--gold)] backdrop-blur-sm",
+          "badge-gold border-primary/30 bg-primary/15 text-[var(--gold)] backdrop-blur-sm",
       },
     },
     defaultVariants: {

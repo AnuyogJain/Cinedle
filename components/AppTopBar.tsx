@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AppearanceToggle } from "./AppearanceToggle";
 import { BrandTitle } from "./BrandTitle";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,7 @@ export function AppTopBar({
   trailing?: ReactNode;
 }) {
   return (
-    <header className="glass-panel sticky top-0 z-20 -mx-4 mb-1 shrink-0 border-x-0 border-t-0 px-2 py-3 shadow-lg shadow-black/20">
+    <header className="app-top-bar glass-panel sticky top-0 z-20 -mx-4 mb-1 shrink-0 border-x-0 border-t-0 px-2 py-3 shadow-lg shadow-black/20">
       <div className="flex items-center justify-between gap-2">
         {backHref ? (
           <Button variant="ghost" size="icon" className="shrink-0" asChild>
@@ -43,8 +44,9 @@ export function AppTopBar({
             </Badge>
           ) : null}
         </div>
-        <div className={cn(sideSlot, "justify-end")}>
-          {trailing ?? <span aria-hidden />}
+        <div className={cn(sideSlot, "justify-end gap-1")}>
+          {trailing}
+          <AppearanceToggle />
         </div>
       </div>
     </header>

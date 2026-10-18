@@ -101,8 +101,8 @@ export default function PreviousPage() {
                       isFuture
                         ? "pointer-events-none border-transparent opacity-30"
                         : done
-                          ? "border-emerald-500/40 bg-emerald-500/25 font-semibold text-emerald-200"
-                          : "border-border bg-secondary/50 hover:bg-secondary",
+                          ? "calendar-day--solved"
+                          : "calendar-day--open border-border bg-secondary/50 hover:bg-secondary",
                     )}
                   >
                     {cell.day}

@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Oswald } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { APPEARANCE_BOOT_SCRIPT, LIGHT_THEME_COLOR } from "@/lib/appearance";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0f",
+  themeColor: LIGHT_THEME_COLOR,
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -36,9 +38,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
+      suppressHydrationWarning
+      data-ui-mode="light"
       className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} h-full antialiased`}
     >
-      <body className="min-h-dvh bg-background text-foreground">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_BOOT_SCRIPT }} />
+      </head>
+      <body className="min-h-dvh bg-background text-foreground">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

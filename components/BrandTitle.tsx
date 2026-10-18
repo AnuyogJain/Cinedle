@@ -8,7 +8,7 @@ export function BrandTitle({ className = "" }: { className?: string }) {
         className,
       )}
     >
-      <span className="text-primary">Cine</span>
+      <span className="brand-title-accent text-primary">Cine</span>
       <span className="text-foreground">dle</span>
     </span>
   );

@@ -3,6 +3,7 @@ import {
   text,
   integer,
   primaryKey,
+  index,
 } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
@@ -36,13 +37,27 @@ export const userBackups = sqliteTable("user_backups", {
     .$defaultFn(() => new Date()),
 });
 
-export const puzzlePoolMovies = sqliteTable("puzzle_pool_movies", {
-  tmdbId: integer("tmdb_id").primaryKey(),
-  title: text("title").notNull(),
-  year: integer("year").notNull(),
-  genreIdsJson: text("genre_ids_json").notNull(),
-  originCountry: text("origin_country").notNull(),
-});
+export const puzzleAssignments = sqliteTable(
+  "puzzle_assignments",
+  {
+    assignmentKey: text("assignment_key").primaryKey(),
+    mode: text("mode", { enum: ["daily", "unlimited"] }).notNull(),
+    puzzleKey: text("puzzle_key").notNull(),
+    filterKey: text("filter_key").notNull().default(""),
+    dailyDate: text("daily_date"),
+    tmdbId: integer("tmdb_id").notNull(),
+    title: text("title").notNull(),
+    year: integer("year").notNull(),
+    genreIdsJson: text("genre_ids_json").notNull(),
+    originCountry: text("origin_country").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (table) => ({
+    dailyDateIdx: index("puzzle_assignments_daily_date_idx").on(table.dailyDate),
+  }),
+);
 
 export const gameProgress = sqliteTable(
   "game_progress",
@@ -55,6 +70,8 @@ export const gameProgress = sqliteTable(
     solved: integer("solved", { mode: "boolean" }).notNull().default(false),
     guessCount: integer("guess_count").notNull().default(0),
     guessesJson: text("guesses_json").notNull().default("[]"),
+    revealTitle: text("reveal_title"),
+    revealYear: integer("reveal_year"),
     completedAt: integer("completed_at", { mode: "timestamp" }),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
