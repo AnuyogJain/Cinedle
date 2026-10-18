@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { puzzlePoolMovies } from "@/lib/db/schema";
 import { poolMovieToRow, rowToPoolMovie } from "@/lib/pool-mappers";
+import { sortPoolStable } from "@/lib/puzzle-picker";
 import { isEligibleMovieTitle, type PoolMovie } from "@/lib/title-normalize";
 
 const POOL_CACHE_MS = 5 * 60 * 1000;
@@ -55,9 +56,9 @@ export async function getPuzzlePool(): Promise<PoolMovie[]> {
   }
 
   const rows = await db.select().from(puzzlePoolMovies);
-  const pool = rows
-    .map(rowToPoolMovie)
-    .filter((m) => isEligibleMovieTitle(m.title));
+  const pool = sortPoolStable(
+    rows.map(rowToPoolMovie).filter((m) => isEligibleMovieTitle(m.title)),
+  );
 
   if (pool.length === 0) {
     throw new Error(

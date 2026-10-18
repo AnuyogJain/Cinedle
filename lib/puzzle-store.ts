@@ -92,12 +92,19 @@ export async function resolvePuzzle(
 export { utcDateString } from "./dates";
 
 export function publicPuzzleView(puzzle: ResolvedPuzzle) {
+  const letterCounts: Record<string, number> = {};
+  for (const word of puzzle.answerWords) {
+    for (const ch of word) {
+      letterCounts[ch] = (letterCounts[ch] ?? 0) + 1;
+    }
+  }
   return {
     puzzleKey: puzzle.puzzleKey,
     mode: puzzle.mode,
     date: puzzle.date,
     wordLengths: puzzle.wordLengths,
     tmdbId: puzzle.tmdbId,
+    letterCounts,
   };
 }
 

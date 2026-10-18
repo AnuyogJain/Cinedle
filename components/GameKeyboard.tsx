@@ -5,20 +5,6 @@ import type { TileState } from "@/lib/grading";
 
 const ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"] as const;
 
-function bestState(
-  current: TileState | undefined,
-  next: TileState,
-): TileState {
-  const rank: Record<TileState, number> = {
-    absent: 0,
-    elsewhere: 1,
-    present: 2,
-    correct: 3,
-  };
-  if (!current) return next;
-  return rank[next] > rank[current] ? next : current;
-}
-
 export function GameKeyboard({
   letterStates,
   onKey,
@@ -88,18 +74,4 @@ function keyClass(state: TileState | undefined) {
   return "key-btn-elsewhere";
 }
 
-export function mergeLetterStates(
-  rows: Array<{ states: TileState[][]; words: string[] }>,
-): Map<string, TileState> {
-  const map = new Map<string, TileState>();
-  for (const row of rows) {
-    row.words.forEach((word, wi) => {
-      word.split("").forEach((letter, li) => {
-        const state = row.states[wi]?.[li];
-        if (!state) return;
-        map.set(letter, bestState(map.get(letter), state));
-      });
-    });
-  }
-  return map;
-}
+export { mergeKeyboardHints as mergeLetterStates } from "@/lib/keyboard-hints";

@@ -19,11 +19,12 @@ import {
   type StoredGuessRow,
 } from "@/lib/progress-local";
 import { GameHeader } from "./GameHeader";
-import { GameKeyboard, mergeLetterStates } from "./GameKeyboard";
+import { mergeKeyboardHints } from "@/lib/keyboard-hints";
+import { GameKeyboard } from "./GameKeyboard";
 import { HowToPlayModal } from "./HowToPlayModal";
 import {
   DraftGuessRow,
-  SubmittedGuessHistory,
+  SubmittedGuessLine,
   type GuessRow,
 } from "./PuzzleGrid";
 import { WinModal } from "./WinModal";
@@ -33,6 +34,7 @@ interface PuzzleView {
   mode: "daily" | "unlimited";
   date: string | null;
   wordLengths: number[];
+  letterCounts: Record<string, number>;
 }
 
 interface FilterQuery {
@@ -67,7 +69,21 @@ export function GamePlay({
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const [shake, setShake] = useState(false);
-  const historyScrollRef = useRef<HTMLDivElement>(null);
+  const boardScrollRef = useRef<HTMLElement>(null);
+
+  const scrollBoardToBottom = useCallback(() => {
+    const el = boardScrollRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    scrollBoardToBottom();
+  }, [submitted.length, scrollBoardToBottom]);
 
   const loadPuzzle = useCallback(async () => {
     setLoading(true);
@@ -144,13 +160,10 @@ export function GamePlay({
     void loadPuzzle();
   }, [loadPuzzle]);
 
-  useEffect(() => {
-    const el = historyScrollRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [submitted.length]);
-
-  const letterStates = useMemo(() => mergeLetterStates(submitted), [submitted]);
+  const letterStates = useMemo(
+    () => mergeKeyboardHints(puzzle?.letterCounts ?? {}, submitted),
+    [puzzle?.letterCounts, submitted],
+  );
 
   const persist = useCallback(
     (
@@ -354,21 +367,20 @@ export function GamePlay({
         subtitle={subtitle}
       />
       <main
-        className={`flex min-h-0 w-full flex-1 flex-col overflow-hidden ${
+        ref={boardScrollRef}
+        className={`scrollbar-hidden flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-contain ${
           shake ? "animate-pulse" : ""
         }`}
       >
-        <div
-          ref={historyScrollRef}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
-        >
-          <SubmittedGuessHistory
-            wordLengths={puzzle.wordLengths}
-            submitted={submitted}
-          />
-        </div>
-        {!won ? (
-          <div className="shrink-0 border-t border-border/50 bg-background/90 py-2 backdrop-blur-sm">
+        <div className="flex w-full flex-col items-center gap-6 py-3">
+          {submitted.map((row, ri) => (
+            <SubmittedGuessLine
+              key={`sub-${ri}`}
+              wordLengths={puzzle.wordLengths}
+              row={row}
+            />
+          ))}
+          {!won ? (
             <DraftGuessRow
               wordLengths={puzzle.wordLengths}
               draftGrid={draftGrid}
@@ -380,9 +392,9 @@ export function GamePlay({
               onSubmit={() => void submitGuess()}
               inputEnabled={!won && !busy}
             />
-          </div>
-        ) : null}
-        <div className="shrink-0 border-t border-border/30 bg-background/95 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          ) : null}
+        </div>
+        <div className="sticky bottom-0 z-10 mt-auto border-t border-border/30 bg-background/95 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
           <GameKeyboard
             letterStates={letterStates}
             onKey={typeLetter}

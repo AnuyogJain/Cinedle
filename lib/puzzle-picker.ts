@@ -19,6 +19,12 @@ export function pickIndex(seed: string, length: number): number {
   return n % length;
 }
 
+export function sortPoolStable(pool: PoolMovie[]): PoolMovie[] {
+  return [...pool].sort(
+    (a, b) => a.tmdbId - b.tmdbId || a.title.localeCompare(b.title),
+  );
+}
+
 export function filterPool(
   pool: PoolMovie[],
   filters: PuzzleFilters,
@@ -50,7 +56,8 @@ export function pickFromPool(
   pool: PoolMovie[],
   seed: string,
 ): PoolMovie | null {
-  if (pool.length === 0) return null;
-  const index = pickIndex(seed, pool.length);
-  return pool[index] ?? null;
+  const sorted = sortPoolStable(pool);
+  if (sorted.length === 0) return null;
+  const index = pickIndex(seed, sorted.length);
+  return sorted[index] ?? null;
 }

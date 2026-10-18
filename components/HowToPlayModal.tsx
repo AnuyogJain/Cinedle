@@ -27,7 +27,7 @@ export function HowToPlayModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-muted hover:bg-surface-hover"
+            className="cursor-pointer rounded-lg p-1 text-muted hover:bg-surface-hover"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -35,14 +35,21 @@ export function HowToPlayModal({
         </div>
 
         <p className="mb-4 text-sm text-muted">
-          Guess the secret <strong className="text-foreground">movie title</strong>.
-          The blanks show how many letters are in each word. Use A–Z only—type
-          spaces between words when you submit.
+          Guess the secret{" "}
+          <strong className="text-foreground">movie title</strong>. The blanks
+          show how many letters are in each word. Use A–Z only—type spaces
+          between words when you submit.
         </p>
 
         <ul className="mb-5 space-y-2 text-sm text-muted">
-          <LegendItem state="correct" label="Green — correct letter and spot in that word" />
-          <LegendItem state="present" label="Yellow — in that word, wrong spot" />
+          <LegendItem
+            state="correct"
+            label="Green — correct letter and spot in that word"
+          />
+          <LegendItem
+            state="present"
+            label="Yellow — in that word, wrong spot"
+          />
           <LegendItem
             state="elsewhere"
             label="Purple — in the title, but a different word"
@@ -80,17 +87,13 @@ export function HowToPlayModal({
   );
 }
 
-function LegendItem({
-  state,
-  label,
-}: {
-  state: TileState;
-  label: string;
-}) {
+function LegendItem({ state, label }: { state: TileState; label: string }) {
   return (
     <li className="flex items-center gap-2">
       <span
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold ${tileClass(state)}`}
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold ${tileClass(
+          state
+        )}`}
         aria-hidden
       >
         A
@@ -135,7 +138,9 @@ function ExampleRow({
           {w.letters.split("").map((ch, i) => (
             <span
               key={`${w.letters}-${i}`}
-              className={`flex h-9 w-9 items-center justify-center rounded-md ${tileClass(w.states[i] ?? "absent")}`}
+              className={`flex h-9 w-9 items-center justify-center rounded-md ${tileClass(
+                w.states[i] ?? "absent"
+              )}`}
             >
               {ch}
             </span>

@@ -1,6 +1,13 @@
 "use client";
 
-import { forwardRef, useCallback, useEffect, useRef, type Ref } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  type ReactNode,
+  type Ref,
+} from "react";
 import type { TileState } from "@/lib/grading";
 import { flatCellIndex, type DraftGrid } from "@/lib/draft-grid";
 
@@ -26,20 +33,14 @@ export interface GuessRow {
   states: TileState[][];
 }
 
-export function SubmittedGuessHistory({
+export function SubmittedGuessLine({
   wordLengths,
-  submitted,
+  row,
 }: {
   wordLengths: number[];
-  submitted: GuessRow[];
+  row: GuessRow;
 }) {
-  return (
-    <div className="flex min-h-min flex-col items-center justify-end gap-6 py-3">
-      {submitted.map((row, ri) => (
-        <GuessLine key={`sub-${ri}`} wordLengths={wordLengths} row={row} />
-      ))}
-    </div>
-  );
+  return <GuessLine wordLengths={wordLengths} row={row} />;
 }
 
 export function DraftGuessRow({
@@ -103,6 +104,18 @@ export function DraftGuessRow({
   );
 }
 
+function WordFlowShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-x-5 gap-y-2.5 px-0.5 sm:gap-x-6">
+      {children}
+    </div>
+  );
+}
+
+function WordTileGroup({ children }: { children: ReactNode }) {
+  return <div className="flex shrink-0 gap-1">{children}</div>;
+}
+
 function GuessLine({
   wordLengths,
   row,
@@ -111,17 +124,17 @@ function GuessLine({
   row: GuessRow;
 }) {
   return (
-    <div className="flex w-full flex-col items-center gap-2">
+    <WordFlowShell>
       {wordLengths.map((len, wi) => (
-        <div key={`w-${wi}`} className="flex max-w-full justify-center gap-1">
+        <WordTileGroup key={`w-${wi}`}>
           {Array.from({ length: len }).map((_, li) => {
             const ch = row.words[wi]?.[li] ?? "";
             const state = row.states[wi]?.[li] ?? "absent";
             return <StaticCell key={`${wi}-${li}`} letter={ch} state={state} />;
           })}
-        </div>
+        </WordTileGroup>
       ))}
-    </div>
+    </WordFlowShell>
   );
 }
 
@@ -153,9 +166,9 @@ function DraftLine({
   onSubmit: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2">
+    <WordFlowShell>
       {wordLengths.map((len, wi) => (
-        <div key={`dw-${wi}`} className="flex max-w-full justify-center gap-1">
+        <WordTileGroup key={`dw-${wi}`}>
           {Array.from({ length: len }).map((_, li) => {
             const letter = draftGrid[wi]?.[li] ?? "";
             const isActive =
@@ -179,9 +192,9 @@ function DraftLine({
               />
             );
           })}
-        </div>
+        </WordTileGroup>
       ))}
-    </div>
+    </WordFlowShell>
   );
 }
 
