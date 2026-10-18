@@ -1,8 +1,8 @@
 "use client";
 
-import { CircleHelp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppTopBar } from "./AppTopBar";
+import { InfoIcon } from "lucide-react";
 
 export function GameHeader({
   backHref = "/",
@@ -20,12 +20,14 @@ export function GameHeader({
       trailing={
         <Button
           type="button"
-          variant="outline"
+          // variant="outline"
           size="icon"
+          className="appearance-toggle shrink-0"
           onClick={onHelp}
           aria-label="How to play"
+          title="How to play"
         >
-          <CircleHelp className="h-5 w-5" />
+          <InfoIcon className="h-5 w-5" />
         </Button>
       }
     />

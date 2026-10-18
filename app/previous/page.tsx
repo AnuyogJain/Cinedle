@@ -61,13 +61,14 @@ export default function PreviousPage() {
           Previous games
         </PageTitle>
 
-        <Card className="border-border/50 bg-card/60">
+        <Card className="calendar-panel bg-card/60">
           <CardContent className="pt-6">
             <div className="mb-4 flex items-center justify-between">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
+                className="calendar-control"
                 onClick={() => shiftMonth(-1)}
               >
                 ‹
@@ -83,6 +84,7 @@ export default function PreviousPage() {
                 type="button"
                 variant="outline"
                 size="sm"
+                className="calendar-control"
                 onClick={() => shiftMonth(1)}
               >
                 ›
@@ -103,12 +105,12 @@ export default function PreviousPage() {
                 const isFuture = today != null && cell.date > today;
                 const slug = puzzleKeyToSlug(key);
                 const dayClass = cn(
-                  "flex h-10 items-center justify-center rounded-lg border text-sm transition",
+                  "calendar-day flex h-10 items-center justify-center rounded-lg text-sm transition",
                   isFuture
-                    ? "pointer-events-none border-border/30 text-muted-foreground opacity-40"
+                    ? "calendar-day--future pointer-events-none"
                     : done
                       ? "calendar-day--solved"
-                      : "calendar-day--open border-border bg-secondary/50 hover:bg-secondary",
+                      : "calendar-day--open",
                 );
 
                 if (isFuture) {

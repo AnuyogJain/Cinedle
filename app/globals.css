@@ -387,21 +387,57 @@ input:disabled,
   color: var(--foreground);
 }
 
+.calendar-day {
+  border: 1px solid var(--border);
+}
+
+.calendar-day--future {
+  border-color: rgb(255 255 255 / 0.12);
+  color: var(--muted-foreground);
+  opacity: 0.45;
+}
+
+.calendar-day--open {
+  background: rgb(255 255 255 / 0.06);
+}
+
+.calendar-day--open:hover {
+  background: rgb(255 255 255 / 0.1);
+}
+
 .calendar-day--solved {
-  border: 1px solid rgb(16 185 129 / 0.4);
+  border-color: rgb(16 185 129 / 0.4);
   background: rgb(16 185 129 / 0.25);
   font-weight: 600;
   color: rgb(167 243 208);
 }
 
+[data-ui-mode="light"] .calendar-day {
+  border-width: 2px;
+}
+
+[data-ui-mode="light"] .calendar-day--future {
+  border-color: rgb(23 23 23 / 0.22);
+  opacity: 0.5;
+}
+
+[data-ui-mode="light"] .calendar-day--open {
+  background: var(--secondary);
+}
+
+[data-ui-mode="light"] .calendar-day--open:hover {
+  background: var(--surface-hover);
+}
+
 [data-ui-mode="light"] .calendar-day--solved {
-  border: 2px solid #15803d;
+  border-color: #15803d;
   background: #dcfce7;
   color: #15803d;
 }
 
-[data-ui-mode="light"] .calendar-day--open {
+[data-ui-mode="light"] .calendar-control {
   border-width: 2px;
+  box-shadow: none;
 }
 
 .home-day--solved {
