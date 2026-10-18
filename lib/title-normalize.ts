@@ -1,7 +1,8 @@
 export const MAX_WORDS = 8;
 export const MAX_TOTAL_LETTERS = 40;
 
-const FORBIDDEN_CHARS = /[:,\d]/;
+/** TMDB display title must match this (no &, :, digits, etc.). Play uses letters-only words. */
+const ELIGIBLE_TITLE_PATTERN = /^[A-Za-z\s'-]+$/;
 
 export interface PoolMovie {
   tmdbId: number;
@@ -29,7 +30,8 @@ export function wordLengths(words: string[]): number[] {
 }
 
 export function isEligibleMovieTitle(title: string): boolean {
-  if (FORBIDDEN_CHARS.test(title)) return false;
+  const trimmed = title.trim();
+  if (!trimmed || !ELIGIBLE_TITLE_PATTERN.test(trimmed)) return false;
   const words = titleToPlayWords(title);
   if (words.length > MAX_WORDS) return false;
   const total = words.reduce((sum, w) => sum + w.length, 0);

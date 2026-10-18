@@ -29,7 +29,7 @@ Puzzles are assigned on first load (daily date or unlimited link) and stored in 
 
 - Guess a phrase matching the shown word lengths (letters A–Z).
 - **Green** — correct letter & position. **Yellow** — in that word, wrong spot. **Purple** — in the title, different word.
-- Answers are movie titles without `:`, commas, or digits in the TMDB display name.
+- Puzzle movies use TMDB titles with **letters, spaces, apostrophe, and hyphen only** (no `&`, `:`, commas, digits, etc.).
 
 ## Backup
 
