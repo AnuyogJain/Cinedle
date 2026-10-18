@@ -1,0 +1,406 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { TileState } from "@/lib/grading";
+import {
+  clearDraftCell,
+  draftGridToGuessText,
+  draftGridToWords,
+  emptyDraftGrid,
+  isDraftComplete,
+  nextCell,
+  prevCell,
+  setDraftCell,
+  type DraftGrid,
+} from "@/lib/draft-grid";
+import {
+  getLocalProgress,
+  upsertLocalProgress,
+  type StoredGuessRow,
+} from "@/lib/progress-local";
+import { GameHeader } from "./GameHeader";
+import { GameKeyboard, mergeLetterStates } from "./GameKeyboard";
+import { HowToPlayModal } from "./HowToPlayModal";
+import {
+  DraftGuessRow,
+  SubmittedGuessHistory,
+  type GuessRow,
+} from "./PuzzleGrid";
+import { WinModal } from "./WinModal";
+
+interface PuzzleView {
+  puzzleKey: string;
+  mode: "daily" | "unlimited";
+  date: string | null;
+  wordLengths: number[];
+}
+
+interface FilterQuery {
+  genres: string;
+  country: string;
+}
+
+export function GamePlay({
+  puzzleKey,
+  filterQuery,
+  backHref,
+  subtitle,
+}: {
+  puzzleKey: string;
+  filterQuery: FilterQuery;
+  backHref: string;
+  subtitle?: string;
+}) {
+  const [puzzle, setPuzzle] = useState<PuzzleView | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [submitted, setSubmitted] = useState<GuessRow[]>([]);
+  const [draftGrid, setDraftGrid] = useState<DraftGrid>([]);
+  const [activeWordIndex, setActiveWordIndex] = useState(0);
+  const [activeLetterIndex, setActiveLetterIndex] = useState(0);
+  const [won, setWon] = useState(false);
+  const [reveal, setReveal] = useState<{
+    displayTitle: string;
+    year: number;
+    posterPath: string | null;
+  } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [shake, setShake] = useState(false);
+  const historyScrollRef = useRef<HTMLDivElement>(null);
+
+  const loadPuzzle = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ key: puzzleKey });
+      if (filterQuery.genres) params.set("genres", filterQuery.genres);
+      if (filterQuery.country) params.set("country", filterQuery.country);
+      const res = await fetch(`/api/puzzle?${params}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to load puzzle");
+      setPuzzle(data);
+      setDraftGrid(emptyDraftGrid(data.wordLengths));
+      setActiveWordIndex(0);
+      setActiveLetterIndex(0);
+
+      const local = getLocalProgress(puzzleKey);
+      if (local?.guesses?.length) {
+        setSubmitted(
+          local.guesses.map((g) => ({
+            words: g.words,
+            states: g.states as TileState[][],
+          }))
+        );
+        setWon(local.solved);
+        if (local.solved && local.revealTitle) {
+          setReveal({
+            displayTitle: local.revealTitle,
+            year: local.revealYear ?? 0,
+            posterPath: null,
+          });
+
+          const last = local.guesses[local.guesses.length - 1];
+          if (last?.words.length) {
+            const guessText = last.words.join(" ");
+            const guessesJson = JSON.stringify(
+              local.guesses.map((g) => ({ words: g.words, states: g.states }))
+            );
+            const gradeRes = await fetch("/api/puzzle/grade", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                puzzleKey,
+                guess: guessText,
+                genres: filterQuery.genres || undefined,
+                country: filterQuery.country || undefined,
+                guessesJson,
+              }),
+            });
+            const gradeData = await gradeRes.json();
+            if (
+              gradeRes.ok &&
+              gradeData.won &&
+              gradeData.reveal?.displayTitle
+            ) {
+              setReveal(gradeData.reveal);
+              upsertLocalProgress({
+                ...local,
+                revealTitle: gradeData.reveal.displayTitle,
+                revealYear: gradeData.reveal.year,
+              });
+            }
+          }
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }, [puzzleKey, filterQuery.country, filterQuery.genres]);
+
+  useEffect(() => {
+    void loadPuzzle();
+  }, [loadPuzzle]);
+
+  useEffect(() => {
+    const el = historyScrollRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [submitted.length]);
+
+  const letterStates = useMemo(() => mergeLetterStates(submitted), [submitted]);
+
+  const persist = useCallback(
+    (
+      rows: GuessRow[],
+      solved: boolean,
+      revealData?: {
+        displayTitle: string;
+        year: number;
+        posterPath: string | null;
+      }
+    ) => {
+      const guesses: StoredGuessRow[] = rows.map((r) => ({
+        words: r.words,
+        states: r.states,
+      }));
+      upsertLocalProgress({
+        puzzleKey,
+        mode: puzzle?.mode ?? "daily",
+        solved,
+        guessCount: rows.length,
+        guesses,
+        completedAt: solved ? new Date().toISOString() : null,
+        updatedAt: new Date().toISOString(),
+        revealTitle: revealData?.displayTitle,
+        revealYear: revealData?.year,
+      });
+
+      void fetch("/api/progress", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          entry: {
+            puzzleKey,
+            mode: puzzle?.mode ?? "daily",
+            solved,
+            guessCount: rows.length,
+            guesses,
+            completedAt: solved ? new Date().toISOString() : null,
+            updatedAt: new Date().toISOString(),
+            revealTitle: revealData?.displayTitle,
+            revealYear: revealData?.year,
+          },
+        }),
+      }).catch(() => null);
+    },
+    [puzzle?.mode, puzzleKey]
+  );
+
+  const submitGuess = useCallback(async () => {
+    if (!puzzle || won || busy) return;
+    if (!isDraftComplete(draftGrid, puzzle.wordLengths)) {
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+      return;
+    }
+
+    const guessText = draftGridToGuessText(draftGrid);
+
+    setBusy(true);
+    try {
+      const nextGuesses = [...submitted];
+      const guessesJson = JSON.stringify(
+        nextGuesses.map((r) => ({ words: r.words, states: r.states }))
+      );
+
+      const res = await fetch("/api/puzzle/grade", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          puzzleKey,
+          guess: guessText,
+          genres: filterQuery.genres || undefined,
+          country: filterQuery.country || undefined,
+          guessesJson,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setShake(true);
+        setTimeout(() => setShake(false), 400);
+        setError(data.error ?? "Invalid guess");
+        return;
+      }
+
+      const row: GuessRow = {
+        words: draftGridToWords(draftGrid),
+        states: data.states as TileState[][],
+      };
+      const rows = [...submitted, row];
+      setSubmitted(rows);
+      setDraftGrid(emptyDraftGrid(puzzle.wordLengths));
+      setActiveWordIndex(0);
+      setActiveLetterIndex(0);
+
+      if (data.won) {
+        setWon(true);
+        setReveal(data.reveal);
+        persist(rows, true, data.reveal ?? undefined);
+      } else {
+        persist(rows, false);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }, [
+    puzzle,
+    won,
+    busy,
+    draftGrid,
+    submitted,
+    puzzleKey,
+    filterQuery,
+    persist,
+  ]);
+
+  const focusCell = useCallback((wordIndex: number, letterIndex: number) => {
+    setActiveWordIndex(wordIndex);
+    setActiveLetterIndex(letterIndex);
+  }, []);
+
+  const applyLetter = useCallback(
+    (wordIndex: number, letterIndex: number, letter: string) => {
+      if (!puzzle || won) return;
+      setDraftGrid((grid) =>
+        setDraftCell(grid, wordIndex, letterIndex, letter)
+      );
+      const next = nextCell(wordIndex, letterIndex, puzzle.wordLengths);
+      if (next) {
+        setActiveWordIndex(next.wordIndex);
+        setActiveLetterIndex(next.letterIndex);
+      }
+    },
+    [puzzle, won]
+  );
+
+  const applyBackspace = useCallback(
+    (wordIndex: number, letterIndex: number) => {
+      if (!puzzle || won) return;
+      const current = draftGrid[wordIndex]?.[letterIndex] ?? "";
+      if (current) {
+        setDraftGrid((grid) => clearDraftCell(grid, wordIndex, letterIndex));
+        setActiveWordIndex(wordIndex);
+        setActiveLetterIndex(letterIndex);
+        return;
+      }
+      const prev = prevCell(wordIndex, letterIndex, puzzle.wordLengths);
+      if (!prev) return;
+      setDraftGrid((grid) =>
+        clearDraftCell(grid, prev.wordIndex, prev.letterIndex)
+      );
+      setActiveWordIndex(prev.wordIndex);
+      setActiveLetterIndex(prev.letterIndex);
+    },
+    [draftGrid, puzzle, won]
+  );
+
+  const typeLetter = useCallback(
+    (letter: string) => {
+      applyLetter(activeWordIndex, activeLetterIndex, letter);
+    },
+    [activeLetterIndex, activeWordIndex, applyLetter]
+  );
+
+  const backspace = useCallback(() => {
+    applyBackspace(activeWordIndex, activeLetterIndex);
+  }, [activeLetterIndex, activeWordIndex, applyBackspace]);
+
+  if (loading) {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4">
+        <GameHeader
+          backHref={backHref}
+          onHelp={() => setHelpOpen(true)}
+          subtitle={subtitle}
+        />
+        <p className="py-20 text-center text-sm text-muted">Loading puzzle…</p>
+      </div>
+    );
+  }
+
+  if (error || !puzzle) {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4">
+        <GameHeader
+          backHref={backHref}
+          onHelp={() => setHelpOpen(true)}
+          subtitle={subtitle}
+        />
+        <p className="py-20 text-center text-sm text-rose-300">
+          {error ?? "Unknown error"}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-lg flex-col overflow-hidden px-4">
+      <GameHeader
+        backHref={backHref}
+        onHelp={() => setHelpOpen(true)}
+        subtitle={subtitle}
+      />
+      <main
+        className={`flex min-h-0 w-full flex-1 flex-col overflow-hidden ${
+          shake ? "animate-pulse" : ""
+        }`}
+      >
+        <div
+          ref={historyScrollRef}
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        >
+          <SubmittedGuessHistory
+            wordLengths={puzzle.wordLengths}
+            submitted={submitted}
+          />
+        </div>
+        {!won ? (
+          <div className="shrink-0 border-t border-border/50 bg-background/90 py-2 backdrop-blur-sm">
+            <DraftGuessRow
+              wordLengths={puzzle.wordLengths}
+              draftGrid={draftGrid}
+              activeWordIndex={activeWordIndex}
+              activeLetterIndex={activeLetterIndex}
+              onFocusCell={focusCell}
+              onCellLetter={applyLetter}
+              onCellBackspace={applyBackspace}
+              onSubmit={() => void submitGuess()}
+              inputEnabled={!won && !busy}
+            />
+          </div>
+        ) : null}
+        <div className="shrink-0 border-t border-border/30 bg-background/95 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <GameKeyboard
+            letterStates={letterStates}
+            onKey={typeLetter}
+            onEnter={() => void submitGuess()}
+            onBackspace={backspace}
+            disabled={busy || won}
+          />
+        </div>
+      </main>
+      <HowToPlayModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <WinModal
+        open={won && reveal != null}
+        guessCount={submitted.length}
+        title={reveal?.displayTitle ?? ""}
+        year={reveal?.year ?? 0}
+        posterPath={reveal?.posterPath ?? null}
+        onClose={() => setReveal(null)}
+      />
+    </div>
+  );
+}

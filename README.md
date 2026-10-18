@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cinedle
 
-## Getting Started
+Expresso-style daily **movie title** puzzle. Same UTC daily title for everyone, optional login for progress sync, archive calendar, and unlimited mode with genre/country filters.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. `npm install`
+2. Copy `env.example` to `.env.local` and set:
+   - `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` (required — puzzle pool, auth, sync)
+   - `TMDB_API_KEY` (required for `pool:refresh` to 3000+ titles; optional for win posters & unlimited TMDB fallback)
+3. `npm run db:push` — apply schema (includes `puzzle_pool_movies`)
+4. `npm run pool:refresh` — fill Turso from TMDB Discover (target **3000** eligible titles), or `npm run pool:import` to seed from `data/puzzle-pool.json` first
+5. `npm run dev` → [http://localhost:3000](http://localhost:3000)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm test` | Grading unit tests |
+| `npm run db:push` | Apply schema to Turso |
+| `npm run pool:refresh` | Upsert puzzle pool in Turso from TMDB (≥3000 titles) |
+| `npm run pool:import` | Import `data/puzzle-pool.json` into Turso (bootstrap) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Game rules
 
-## Learn More
+- Guess a phrase matching the shown word lengths (letters A–Z).
+- **Green** — correct letter & position. **Yellow** — in that word, wrong spot. **Purple** — in the title, different word.
+- Answers are multi-word movie titles without `:`, commas, or digits.
 
-To learn more about Next.js, take a look at the following resources:
+## Backup
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Logged-in users can export/import CSV progress from **Account** (same pattern as CineSwipe backups).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Attribution
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Movie metadata and posters from [TMDB](https://www.themoviedb.org/). This product uses the TMDB API but is not endorsed or certified by TMDB.

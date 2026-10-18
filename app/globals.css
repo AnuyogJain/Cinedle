@@ -1,26 +1,199 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --imdb-yellow: #f5c518;
+}
+
+[data-theme="dark-midnight"] {
+  color-scheme: dark;
+  --background: #0a0a0f;
+  --foreground: #f4f4f5;
+  --foreground-muted: rgb(244 244 245 / 0.68);
+  --foreground-subtle: rgb(244 244 245 / 0.44);
+  --surface: rgb(255 255 255 / 0.05);
+  --surface-hover: rgb(255 255 255 / 0.1);
+  --border: rgb(255 255 255 / 0.1);
+  --body-gradient: radial-gradient(circle at top, #1a1024 0%, #0a0a0f 45%, #050508 100%);
+  --accent: #fb7185;
+  --accent-text: #fecdd3;
+  --tile-empty: rgb(255 255 255 / 0.04);
+  --tile-empty-border: rgb(167 139 250 / 0.28);
+  --tile-filled: rgb(255 255 255 / 0.14);
+  --tile-filled-border: rgb(196 181 253 / 0.95);
+  --tile-correct: #22c55e;
+  --tile-present: #eab308;
+  --tile-elsewhere: #a855f7;
+  --tile-absent: rgb(24 24 27 / 0.95);
+  --keyboard-key: rgb(109 40 217 / 0.85);
+  --keyboard-key-text: #fafafa;
+  --keyboard-key-absent: rgb(24 24 27 / 0.98);
+  --keyboard-key-absent-text: rgb(255 255 255 / 0.28);
+}
+
+[data-theme="dark-oled"] {
+  color-scheme: dark;
+  --background: #000000;
+  --foreground: #fafafa;
+  --foreground-muted: rgb(250 250 250 / 0.66);
+  --foreground-subtle: rgb(250 250 250 / 0.42);
+  --surface: rgb(255 255 255 / 0.06);
+  --surface-hover: rgb(255 255 255 / 0.11);
+  --border: rgb(255 255 255 / 0.12);
+  --body-gradient: radial-gradient(circle at top, #111111 0%, #000000 55%, #000000 100%);
+  --accent: #f43f5e;
+  --accent-text: #fda4af;
+  --tile-empty: rgb(255 255 255 / 0.03);
+  --tile-empty-border: rgb(255 255 255 / 0.14);
+  --tile-filled: rgb(255 255 255 / 0.12);
+  --tile-filled-border: rgb(255 255 255 / 0.55);
+  --tile-correct: #22c55e;
+  --tile-present: #eab308;
+  --tile-elsewhere: #a855f7;
+  --tile-absent: rgb(10 10 10 / 0.95);
+  --keyboard-key: rgb(63 63 70 / 0.95);
+  --keyboard-key-text: #fafafa;
+  --keyboard-key-absent: rgb(18 18 18 / 0.98);
+  --keyboard-key-absent-text: rgb(255 255 255 / 0.25);
+}
+
+[data-theme="dark-amethyst"] {
+  color-scheme: dark;
+  --background: #140820;
+  --foreground: #f5f3ff;
+  --foreground-muted: rgb(245 243 255 / 0.68);
+  --foreground-subtle: rgb(245 243 255 / 0.44);
+  --surface: rgb(255 255 255 / 0.06);
+  --surface-hover: rgb(255 255 255 / 0.1);
+  --border: rgb(255 255 255 / 0.1);
+  --body-gradient: radial-gradient(circle at top, #2e1065 0%, #140820 50%, #0a0412 100%);
+  --accent: #e879f9;
+  --accent-text: #f5d0fe;
+  --tile-empty: rgb(255 255 255 / 0.04);
+  --tile-empty-border: rgb(192 132 252 / 0.3);
+  --tile-filled: rgb(255 255 255 / 0.13);
+  --tile-filled-border: rgb(216 180 254 / 0.95);
+  --tile-correct: #22c55e;
+  --tile-present: #eab308;
+  --tile-elsewhere: #c084fc;
+  --tile-absent: rgb(30 15 45 / 0.95);
+  --keyboard-key: rgb(88 28 135 / 0.9);
+  --keyboard-key-text: #fafafa;
+  --keyboard-key-absent: rgb(30 15 45 / 0.98);
+  --keyboard-key-absent-text: rgb(255 255 255 / 0.28);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--foreground-muted);
+  --color-subtle: var(--foreground-subtle);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
 }
 
 body {
-  background: var(--background);
+  background: var(--body-gradient);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+}
+
+.app-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.app-input {
+  background: rgb(0 0 0 / 0.32);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.btn-primary {
+  background: var(--keyboard-key);
+  color: var(--keyboard-key-text);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-hover);
+}
+
+.tile {
+  border: 2px solid var(--tile-empty-border);
+  background: var(--tile-empty);
+}
+
+.tile-empty {
+  border-style: dashed;
+  border-color: var(--tile-empty-border);
+  background: var(--tile-empty);
+}
+
+.tile-filled {
+  border-style: solid;
+  border-color: var(--tile-filled-border);
+  background: var(--tile-filled);
+  color: var(--foreground);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+.tile-correct {
+  background: var(--tile-correct);
+  border-color: var(--tile-correct);
+  color: #fff;
+}
+
+.tile-present {
+  background: var(--tile-present);
+  border-color: var(--tile-present);
+  color: #fff;
+}
+
+.tile-elsewhere {
+  background: var(--tile-elsewhere);
+  border-color: var(--tile-elsewhere);
+  color: #fff;
+}
+
+.tile-absent {
+  background: var(--tile-absent);
+  border-color: var(--tile-absent);
+  color: rgb(255 255 255 / 0.35);
+}
+
+.key-btn {
+  background: var(--keyboard-key);
+  color: var(--keyboard-key-text);
+}
+
+.key-btn-unused {
+  background: var(--keyboard-key);
+  color: var(--keyboard-key-text);
+}
+
+.key-btn-absent {
+  background: var(--keyboard-key-absent);
+  color: var(--keyboard-key-absent-text);
+}
+
+.key-btn-correct {
+  background: var(--tile-correct);
+  color: #fff;
+}
+
+.key-btn-present {
+  background: var(--tile-present);
+  color: #fff;
+}
+
+.key-btn-elsewhere {
+  background: var(--tile-elsewhere);
+  color: #fff;
 }
