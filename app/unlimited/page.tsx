@@ -7,7 +7,6 @@ import { PageFrame, PageTitle } from "@/components/PageFrame";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { SingleSelectDropdown } from "@/components/SingleSelectDropdown";
 import { COUNTRY_OPTIONS, TMDB_GENRES } from "@/lib/genres";
 import { unlimitedPuzzleKey, puzzleKeyToSlug } from "@/lib/puzzle-key-url";
 import { cn } from "@/lib/utils";
@@ -21,6 +20,10 @@ export default function UnlimitedPage() {
     setGenreIds((prev) =>
       prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id],
     );
+  };
+
+  const selectCountry = (code: string) => {
+    setCountry((prev) => (prev === code ? "" : code));
   };
 
   const start = () => {
@@ -77,21 +80,57 @@ export default function UnlimitedPage() {
           </CardContent>
         </Card>
 
-        <section className="mb-8">
-          <SingleSelectDropdown
-            label="Country"
-            value={country}
-            emptyValue=""
-            onChange={setCountry}
-            options={[
-              { value: "", label: "Any" },
-              ...COUNTRY_OPTIONS.map((c) => ({
-                value: c.code,
-                label: c.name,
-              })),
-            ]}
-          />
-        </section>
+        <Card className="mb-8 border-border/50 bg-card/60">
+          <CardContent className="pt-6">
+            <h2 className="mb-2 text-xs font-medium uppercase tracking-wide text-subtle">
+              Country
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setCountry("")}
+                className={cn(
+                  "cursor-pointer rounded-full transition",
+                  !country ? "" : "opacity-90",
+                )}
+              >
+                <Badge
+                  variant={!country ? "default" : "secondary"}
+                  className={cn(
+                    "cursor-pointer px-3 py-1 text-xs",
+                    !country && "bg-primary text-primary-foreground",
+                  )}
+                >
+                  Any
+                </Badge>
+              </button>
+              {COUNTRY_OPTIONS.map((c) => {
+                const active = country === c.code;
+                return (
+                  <button
+                    key={c.code}
+                    type="button"
+                    onClick={() => selectCountry(c.code)}
+                    className={cn(
+                      "cursor-pointer rounded-full transition",
+                      active ? "" : "opacity-90",
+                    )}
+                  >
+                    <Badge
+                      variant={active ? "default" : "secondary"}
+                      className={cn(
+                        "cursor-pointer px-3 py-1 text-xs",
+                        active && "bg-primary text-primary-foreground",
+                      )}
+                    >
+                      {c.name}
+                    </Badge>
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
         <Button variant="default" size="lg" className="btn-cta w-full" onClick={start}>
           Start puzzle

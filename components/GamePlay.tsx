@@ -27,12 +27,10 @@ import { GameHeader } from "./GameHeader";
 import { mergeKeyboardHints } from "@/lib/keyboard-hints";
 import { GameKeyboard } from "./GameKeyboard";
 import { HowToPlayModal } from "./HowToPlayModal";
-import {
-  DraftGuessRow,
-  SubmittedGuessLine,
-  type GuessRow,
-} from "./PuzzleGrid";
+import { DraftGuessRow, SubmittedGuessLine, type GuessRow } from "./PuzzleGrid";
+import { PuzzleLoadError } from "./PuzzleLoadError";
 import { WinModal } from "./WinModal";
+import type { PuzzleErrorCode } from "@/lib/puzzle-errors";
 
 interface PuzzleView {
   puzzleKey: string;
@@ -60,7 +58,10 @@ export function GamePlay({
 }) {
   const [puzzle, setPuzzle] = useState<PuzzleView | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{
+    message: string;
+    code?: PuzzleErrorCode | string;
+  } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [submitted, setSubmitted] = useState<GuessRow[]>([]);
   const [draftGrid, setDraftGrid] = useState<DraftGrid>([]);
@@ -101,8 +102,18 @@ export function GamePlay({
       if (filterQuery.genres) params.set("genres", filterQuery.genres);
       if (filterQuery.country) params.set("country", filterQuery.country);
       const res = await fetch(`/api/puzzle?${params}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to load puzzle");
+      const data = (await res.json()) as {
+        error?: string;
+        code?: PuzzleErrorCode | string;
+      };
+      if (!res.ok) {
+        setError({
+          message: data.error ?? "Failed to load puzzle",
+          code: data.code,
+        });
+        setPuzzle(null);
+        return;
+      }
       setPuzzle(data);
       setDraftGrid(emptyDraftGrid(data.wordLengths));
       setActiveWordIndex(0);
@@ -159,7 +170,10 @@ export function GamePlay({
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load");
+      setError({
+        message: err instanceof Error ? err.message : "Failed to load",
+      });
+      setPuzzle(null);
     } finally {
       setLoading(false);
     }
@@ -171,7 +185,7 @@ export function GamePlay({
 
   const letterStates = useMemo(
     () => mergeKeyboardHints(puzzle?.letterCounts ?? {}, submitted),
-    [puzzle?.letterCounts, submitted],
+    [puzzle?.letterCounts, submitted]
   );
 
   const persist = useCallback(
@@ -346,9 +360,16 @@ export function GamePlay({
           onHelp={() => setHelpOpen(true)}
           subtitle={subtitle}
         />
-        <p className="py-20 text-center text-sm text-rose-300">
-          {error ?? "Unknown error"}
-        </p>
+        <PuzzleLoadError
+          code={error?.code}
+          message={
+            error?.message ?? "Something went wrong loading this puzzle."
+          }
+          backHref={backHref}
+          filterQuery={filterQuery}
+          onRetry={() => void loadPuzzle()}
+        />
+        <HowToPlayModal open={helpOpen} onClose={() => setHelpOpen(false)} />
       </div>
     );
   }

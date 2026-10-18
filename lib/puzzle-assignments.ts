@@ -6,7 +6,12 @@ import { puzzleAssignments } from "@/lib/db/schema";
 import { buildAssignmentKey, parsePuzzleKey } from "@/lib/puzzle-parse";
 import { buildPickerSeed, filterKey, type PuzzleFilters } from "@/lib/puzzle-picker";
 import { isEligibleMovieTitle, type PoolMovie } from "@/lib/title-normalize";
+import { PuzzleServiceError } from "@/lib/puzzle-errors";
 import { discoverEligibleMovie } from "@/lib/tmdb-discover";
+
+function tmdbApiKeyConfigured(): boolean {
+  return Boolean(process.env.TMDB_API_KEY?.trim());
+}
 
 const RECENT_DAILY_WINDOW = 299;
 const MAX_ASSIGN_ATTEMPTS = 20;
@@ -57,6 +62,13 @@ export async function getOrCreateAssignment(
   const existing = await loadAssignment(assignmentKey);
   if (existing) return existing;
 
+  if (!tmdbApiKeyConfigured()) {
+    throw new PuzzleServiceError(
+      "tmdb_not_configured",
+      "Movie lookup is not configured on the server.",
+    );
+  }
+
   const { mode, keyPart } = parsed;
   const fKey = filterKey(filters);
   const seed = buildPickerSeed(mode, keyPart, filters);
@@ -101,7 +113,8 @@ export async function getOrCreateAssignment(
     }
   }
 
-  throw new Error(
-    "Could not assign puzzle from TMDB. Check TMDB_API_KEY and try again.",
+  throw new PuzzleServiceError(
+    "no_eligible_movie",
+    "We couldn't find an eligible movie for this filter combination. Try fewer genres or a different country.",
   );
 }

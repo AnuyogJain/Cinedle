@@ -1,4 +1,5 @@
 export const MAX_WORDS = 8;
+export const MAX_WORD_LENGTH = 10;
 export const MAX_TOTAL_LETTERS = 40;
 
 /** TMDB display title must match this (no &, :, digits, etc.). Play uses letters-only words. */
@@ -37,6 +38,7 @@ export function isEligibleMovieTitle(title: string): boolean {
   const total = words.reduce((sum, w) => sum + w.length, 0);
   if (total > MAX_TOTAL_LETTERS) return false;
   if (words.some((w) => w.length === 0)) return false;
+  if (words.some((w) => w.length > MAX_WORD_LENGTH)) return false;
   return true;
 }
 

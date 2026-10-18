@@ -2,10 +2,7 @@ import "server-only";
 
 import { pickIndex } from "./puzzle-picker";
 import type { PuzzleFilters } from "./puzzle-picker";
-import {
-  isEligibleMovieTitle,
-  type PoolMovie,
-} from "./title-normalize";
+import { isEligibleMovieTitle, type PoolMovie } from "./title-normalize";
 
 const TMDB_BASE = "https://api.themoviedb.org/3";
 
@@ -25,7 +22,7 @@ function tmdbKey(): string | null {
 }
 
 export async function fetchMoviePosterPath(
-  tmdbId: number,
+  tmdbId: number
 ): Promise<string | null> {
   const apiKey = tmdbKey();
   if (!apiKey) return null;
@@ -43,7 +40,7 @@ export async function fetchMoviePosterPath(
 export async function discoverEligibleMovie(
   seed: string,
   filters: PuzzleFilters,
-  attempt = 0,
+  attempt = 0
 ): Promise<PoolMovie | null> {
   const apiKey = tmdbKey();
   if (!apiKey) return null;
@@ -63,7 +60,7 @@ export async function discoverEligibleMovie(
   if (filters.originCountry) {
     url.searchParams.set(
       "with_origin_country",
-      filters.originCountry.trim().toUpperCase(),
+      filters.originCountry.trim().toUpperCase()
     );
   }
 

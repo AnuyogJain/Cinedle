@@ -19,4 +19,9 @@ describe("isEligibleMovieTitle", () => {
   it("play words strip apostrophes from allowed titles", () => {
     assert.deepEqual(titleToPlayWords("Don't Look Up"), ["DONT", "LOOK", "UP"]);
   });
+
+  it("rejects any word longer than ten letters", () => {
+    assert.equal(isEligibleMovieTitle("ABCDEFGHIJK"), false);
+    assert.equal(isEligibleMovieTitle("ABCDEFGHIJ"), true);
+  });
 });
