@@ -64,7 +64,7 @@ export function WinModal({
       <DialogContent
         className={cn(
           "max-w-[min(100vw-2rem,22rem)] gap-0 overflow-hidden border-primary/25 p-0",
-          "shadow-[0_0_0_1px_rgb(245_197_24/0.12),0_24px_80px_rgb(0_0_0/0.55)]",
+          "shadow-[0_0_0_1px_rgb(245_197_24/0.12),0_24px_80px_rgb(0_0_0/0.55)]"
         )}
       >
         <div className="relative border-b border-border/50 bg-gradient-to-b from-primary/10 via-transparent to-transparent px-6 pb-5 pt-8 text-center">
@@ -118,7 +118,10 @@ export function WinModal({
 
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
             {year ? (
-              <Badge variant="outline" className="border-primary/35 font-normal">
+              <Badge
+                variant="outline"
+                className="border-primary/35 font-normal"
+              >
                 {year}
               </Badge>
             ) : null}
@@ -142,7 +145,11 @@ export function WinModal({
               asChild={Boolean(cineswipeHref && authChecked)}
             >
               {cineswipeHref && authChecked ? (
-                <a href={cineswipeHref}>
+                <a
+                  href={cineswipeHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   View on CineSwipe
                   <ExternalLink className="h-4 w-4" aria-hidden />
                 </a>
@@ -151,7 +158,12 @@ export function WinModal({
               )}
             </Button>
           ) : null}
-          <Button variant="default" size="lg" className="w-full" onClick={onClose}>
+          <Button
+            variant="default"
+            size="lg"
+            className="w-full"
+            onClick={onClose}
+          >
             Done
           </Button>
         </div>

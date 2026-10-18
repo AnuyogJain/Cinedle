@@ -12,7 +12,10 @@ export function draftGridToGuessText(grid: DraftGrid): string {
   return draftGridToWords(grid).join(" ");
 }
 
-export function isDraftComplete(grid: DraftGrid, wordLengths: number[]): boolean {
+export function isDraftComplete(
+  grid: DraftGrid,
+  wordLengths: number[]
+): boolean {
   return wordLengths.every((len, wi) => {
     const word = grid[wi] ?? [];
     if (word.length !== len) return false;
@@ -24,9 +27,12 @@ export function setDraftCell(
   grid: DraftGrid,
   wordIndex: number,
   letterIndex: number,
-  letter: string,
+  letter: string
 ): DraftGrid {
-  const ch = letter.replace(/[^a-zA-Z]/g, "").slice(-1).toUpperCase();
+  const ch = letter
+    .replace(/[^a-zA-Z]/g, "")
+    .slice(-1)
+    .toUpperCase();
   const next = grid.map((word) => [...word]);
   if (!next[wordIndex]) return next;
   next[wordIndex][letterIndex] = ch;
@@ -36,7 +42,7 @@ export function setDraftCell(
 export function clearDraftCell(
   grid: DraftGrid,
   wordIndex: number,
-  letterIndex: number,
+  letterIndex: number
 ): DraftGrid {
   const next = grid.map((word) => [...word]);
   if (!next[wordIndex]) return next;
@@ -47,7 +53,7 @@ export function clearDraftCell(
 export function nextCell(
   wordIndex: number,
   letterIndex: number,
-  wordLengths: number[],
+  wordLengths: number[]
 ): { wordIndex: number; letterIndex: number } | null {
   const len = wordLengths[wordIndex] ?? 0;
   if (letterIndex < len - 1) {
@@ -62,7 +68,7 @@ export function nextCell(
 export function prevCell(
   wordIndex: number,
   letterIndex: number,
-  wordLengths: number[],
+  wordLengths: number[]
 ): { wordIndex: number; letterIndex: number } | null {
   if (letterIndex > 0) {
     return { wordIndex, letterIndex: letterIndex - 1 };
@@ -77,7 +83,7 @@ export function prevCell(
 export function flatCellIndex(
   wordIndex: number,
   letterIndex: number,
-  wordLengths: number[],
+  wordLengths: number[]
 ): number {
   let index = 0;
   for (let wi = 0; wi < wordIndex; wi++) {
@@ -88,7 +94,7 @@ export function flatCellIndex(
 
 export function cellFromFlatIndex(
   flatIndex: number,
-  wordLengths: number[],
+  wordLengths: number[]
 ): { wordIndex: number; letterIndex: number } {
   let remaining = flatIndex;
   for (let wi = 0; wi < wordLengths.length; wi++) {
