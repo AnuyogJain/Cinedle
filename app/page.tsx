@@ -65,9 +65,7 @@ export default function HomePage() {
   }, []);
 
   const weekDays = useMemo(() => utcWeekDays(today), [today]);
-  const todayKey = dailyPuzzleKey(today);
-  const dailySlug = puzzleKeyToSlug(todayKey);
-  const todaySolved = progress[todayKey]?.solved === true;
+  const dailySlug = puzzleKeyToSlug(dailyPuzzleKey(today));
 
   return (
     <PageFrame>
@@ -81,15 +79,8 @@ export default function HomePage() {
               <p className="min-w-0 flex-1 truncate text-center text-sm text-muted-foreground">
                 {formatUsDate(today)}
               </p>
-              <Button
-                size="sm"
-                variant={todaySolved ? "outline" : "default"}
-                className="shrink-0 px-4"
-                asChild
-              >
-                <Link href={`/play/${dailySlug}`}>
-                  {todaySolved ? "Review" : "Play"}
-                </Link>
+              <Button size="sm" className="shrink-0 px-4" asChild>
+                <Link href={`/play/${dailySlug}`}>Play</Link>
               </Button>
             </div>
 
