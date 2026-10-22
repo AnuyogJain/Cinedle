@@ -43,9 +43,18 @@ export default function HomePage() {
   const today = utcDateString();
 
   useEffect(() => {
-    void pullServerProgressIntoLocal().then(() =>
-      setProgress(readLocalProgress()),
-    );
+    const syncProgress = () => {
+      void pullServerProgressIntoLocal().then(() =>
+        setProgress(readLocalProgress()),
+      );
+    };
+    syncProgress();
+    window.addEventListener("focus", syncProgress);
+    window.addEventListener("pageshow", syncProgress);
+    return () => {
+      window.removeEventListener("focus", syncProgress);
+      window.removeEventListener("pageshow", syncProgress);
+    };
   }, []);
 
   useEffect(() => {
@@ -56,7 +65,9 @@ export default function HomePage() {
   }, []);
 
   const weekDays = useMemo(() => utcWeekDays(today), [today]);
-  const dailySlug = puzzleKeyToSlug(dailyPuzzleKey(today));
+  const todayKey = dailyPuzzleKey(today);
+  const dailySlug = puzzleKeyToSlug(todayKey);
+  const todaySolved = progress[todayKey]?.solved === true;
 
   return (
     <PageFrame>
@@ -70,8 +81,15 @@ export default function HomePage() {
               <p className="min-w-0 flex-1 truncate text-center text-sm text-muted-foreground">
                 {formatUsDate(today)}
               </p>
-              <Button size="sm" className="shrink-0 px-4" asChild>
-                <Link href={`/play/${dailySlug}`}>Play</Link>
+              <Button
+                size="sm"
+                variant={todaySolved ? "outline" : "default"}
+                className="shrink-0 px-4"
+                asChild
+              >
+                <Link href={`/play/${dailySlug}`}>
+                  {todaySolved ? "Review" : "Play"}
+                </Link>
               </Button>
             </div>
 
@@ -87,21 +105,36 @@ export default function HomePage() {
                 const cell = (
                   <div
                     className={cn(
-                      "flex flex-col items-center rounded-xl px-0.5 py-2 transition",
+                      "calendar-day flex flex-col items-center rounded-xl border px-0.5 py-2 transition",
+                      isFuture && "calendar-day--future opacity-35",
+                      solved && "calendar-day--solved font-semibold",
+                      !solved &&
+                        !isFuture &&
+                        "calendar-day--open hover:bg-secondary/60",
                       isToday &&
+                        !solved &&
                         "home-day--today bg-primary/15 ring-1 ring-primary/35 shadow-[0_0_20px_-6px_var(--primary-glow)]",
-                      !isToday && !isFuture && "hover:bg-secondary/60",
-                      isFuture && "opacity-35",
-                      solved && !isToday && "home-day--solved"
+                      isToday &&
+                        solved &&
+                        "ring-1 ring-emerald-600/40 dark:ring-emerald-400/35",
                     )}
                   >
-                    <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                    <span
+                      className={cn(
+                        "text-[10px] font-medium uppercase tracking-wide",
+                        solved
+                          ? "text-inherit opacity-90"
+                          : "text-muted-foreground",
+                      )}
+                    >
                       {dow}
                     </span>
                     <span
                       className={cn(
                         "mt-0.5 text-lg font-semibold leading-none",
-                        isToday ? "text-primary" : "text-foreground"
+                        solved && "text-inherit",
+                        !solved && isToday && "text-primary",
+                        !solved && !isToday && "text-foreground",
                       )}
                     >
                       {day}
