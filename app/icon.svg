@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="cndlBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161522"/>
+      <stop offset="50%" stop-color="#0C0B14"/>
+      <stop offset="100%" stop-color="#050408"/>
+    </linearGradient>
+
+    <!-- Outer Rim Gradient -->
+    <linearGradient id="cndlRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5C518" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#22C55E" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <!-- Tile Gradients -->
+    <linearGradient id="tileGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ADE80"/>
+      <stop offset="100%" stop-color="#16A34A"/>
+    </linearGradient>
+
+    <linearGradient id="tileGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="60%" stop-color="#EAB308"/>
+      <stop offset="100%" stop-color="#CA8A04"/>
+    </linearGradient>
+
+    <linearGradient id="tilePurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+
+    <linearGradient id="tileRose" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FB7185"/>
+      <stop offset="100%" stop-color="#E11D48"/>
+    </linearGradient>
+
+    <!-- Drop Shadow -->
+    <filter id="cndlShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000000" flood-opacity="0.7"/>
+    </filter>
+
+    <filter id="cndlGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="36" result="blur"/>
+    </filter>
+
+    <!-- Main Squircle Clip to eliminate ANY edge bleeding -->
+    <clipPath id="squircleClip">
+      <rect x="0" y="0" width="512" height="512" rx="128"/>
+    </clipPath>
+
+    <clipPath id="topBarClip">
+      <rect x="0" y="0" width="300" height="64" rx="20"/>
+    </clipPath>
+  </defs>
+
+  <!-- EVERYTHING clipped within the squircle -->
+  <g clip-path="url(#squircleClip)">
+    <!-- Base Background -->
+    <rect width="512" height="512" fill="url(#cndlBg)"/>
+
+    <!-- Ambient Glows (strictly clipped inside) -->
+    <circle cx="200" cy="240" r="140" fill="#22C55E" opacity="0.22" filter="url(#cndlGlow)"/>
+    <circle cx="320" cy="270" r="140" fill="#F5C518" opacity="0.22" filter="url(#cndlGlow)"/>
+
+    <!-- CLAPPERBOARD & 2x2 CINE TILES -->
+    <g transform="translate(106 92)" filter="url(#cndlShadow)">
+      
+      <!-- Top Clapper Bar (-8 deg tilt) -->
+      <g transform="translate(150 36) rotate(-8) translate(-150 -36)">
+        <g clip-path="url(#topBarClip)">
+          <rect x="0" y="0" width="300" height="64" fill="#12131C"/>
+          <g fill="#F5C518">
+            <polygon points="36,0 72,0 36,64 0,64"/>
+            <polygon points="108,0 144,0 108,64 72,64"/>
+            <polygon points="180,0 216,0 180,64 144,64"/>
+            <polygon points="252,0 288,0 252,64 216,64"/>
+            <polygon points="324,0 360,0 324,64 288,64"/>
+          </g>
+        </g>
+        <rect x="0" y="0" width="300" height="64" rx="20" fill="none" stroke="#F5C518" stroke-width="4" stroke-opacity="0.8"/>
+        <!-- Bolt -->
+        <circle cx="26" cy="32" r="9" fill="#18181B" stroke="#FFFFFF" stroke-width="3"/>
+      </g>
+
+      <!-- Lower Clapper Body -->
+      <rect x="0" y="72" width="300" height="254" rx="28" fill="#13141E" stroke="#252636" stroke-width="5"/>
+
+      <!-- Film Sprocket holes on left -->
+      <g fill="#F5C518" opacity="0.9">
+        <rect x="14" y="98" width="12" height="18" rx="4"/>
+        <rect x="14" y="138" width="12" height="18" rx="4"/>
+        <rect x="14" y="178" width="12" height="18" rx="4"/>
+        <rect x="14" y="218" width="12" height="18" rx="4"/>
+        <rect x="14" y="258" width="12" height="18" rx="4"/>
+        <rect x="14" y="298" width="12" height="18" rx="4"/>
+      </g>
+
+      <!-- 2x2 Big Puzzle Tiles: C, I, N, E -->
+      <g transform="translate(44 88)">
+        <!-- Tile 1: C (Emerald Green) -->
+        <g transform="translate(0 0)">
+          <rect width="114" height="106" rx="18" fill="url(#tileGreen)"/>
+          <rect width="114" height="106" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-opacity="0.4"/>
+          <text x="57" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="68" font-weight="900" fill="#FFFFFF" text-anchor="middle">C</text>
+        </g>
+
+        <!-- Tile 2: I (Cinema Gold) -->
+        <g transform="translate(128 0)">
+          <rect width="114" height="106" rx="18" fill="url(#tileGold)"/>
+          <rect width="114" height="106" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-opacity="0.4"/>
+          <text x="57" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="68" font-weight="900" fill="#0A0A0F" text-anchor="middle">I</text>
+        </g>
+
+        <!-- Tile 3: N (Elsewhere Purple) -->
+        <g transform="translate(0 120)">
+          <rect width="114" height="106" rx="18" fill="url(#tilePurple)"/>
+          <rect width="114" height="106" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-opacity="0.4"/>
+          <text x="57" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="68" font-weight="900" fill="#FFFFFF" text-anchor="middle">N</text>
+        </g>
+
+        <!-- Tile 4: E (Cinema Rose) -->
+        <g transform="translate(128 120)">
+          <rect width="114" height="106" rx="18" fill="url(#tileRose)"/>
+          <rect width="114" height="106" rx="18" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-opacity="0.4"/>
+          <text x="57" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="68" font-weight="900" fill="#FFFFFF" text-anchor="middle">E</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Cinema Star Sparkle in Top-Right -->
+    <g transform="translate(426 84)">
+      <path d="M0 -34 Q0 0 34 0 Q0 0 0 34 Q0 0 -34 0 Q0 0 0 -34 Z" fill="#FDE047"/>
+      <circle cx="0" cy="0" r="6" fill="#FFFFFF"/>
+    </g>
+
+    <!-- Outer Rim Stroke right inside the clip -->
+    <rect x="4" y="4" width="504" height="504" rx="124" fill="none" stroke="url(#cndlRim)" stroke-width="8"/>
+  </g>
+</svg>

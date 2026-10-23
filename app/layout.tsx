@@ -26,6 +26,13 @@ export const metadata: Metadata = {
   title: "Cinedle",
   applicationName: "Cinedle",
   description: "Daily movie title puzzle — cinema-themed Wordle for film buffs",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
