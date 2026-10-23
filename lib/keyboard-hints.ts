@@ -17,6 +17,10 @@ export function letterCountsInAnswer(
   return counts;
 }
 
+function cellKey(wordIndex: number, letterIndex: number): string {
+  return `${wordIndex}-${letterIndex}`;
+}
+
 export function mergeKeyboardHints(
   letterCounts: Record<string, number>,
   submissions: GuessSubmission[],
@@ -30,6 +34,7 @@ export function mergeKeyboardHints(
     let hasCorrect = false;
     let hasPresent = false;
     let hasElsewhere = false;
+    const solvedPositions = new Set<string>();
 
     for (const row of submissions) {
       row.words.forEach((word, wi) => {
@@ -38,7 +43,10 @@ export function mergeKeyboardHints(
           const state = row.states[wi]?.[li];
           if (!state) return;
           hasGuessed = true;
-          if (state === "correct") hasCorrect = true;
+          if (state === "correct") {
+            hasCorrect = true;
+            solvedPositions.add(cellKey(wi, li));
+          }
           if (state === "present") hasPresent = true;
           if (state === "elsewhere") hasElsewhere = true;
         });
@@ -50,13 +58,15 @@ export function mergeKeyboardHints(
       continue;
     }
 
-    // Best hint wins (Wordle-style): green beats yellow/purple across all guesses.
-    if (hasCorrect) {
+    const allSolved = solvedPositions.size >= totalInAnswer;
+    if (allSolved) {
       map.set(letter, "correct");
     } else if (hasPresent) {
       map.set(letter, "present");
     } else if (hasElsewhere) {
       map.set(letter, "elsewhere");
+    } else if (hasCorrect) {
+      map.set(letter, "correct");
     }
   }
 
