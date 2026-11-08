@@ -26,6 +26,12 @@ export const metadata: Metadata = {
   title: "Cinedle",
   applicationName: "Cinedle",
   description: "Daily movie title puzzle — cinema-themed Wordle for film buffs",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Cinedle",
+  },
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
