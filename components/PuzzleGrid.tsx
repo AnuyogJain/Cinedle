@@ -230,7 +230,7 @@ const DraftCell = forwardRef(function DraftCell(
       <input
         ref={ref}
         type="text"
-        inputMode="text"
+        inputMode="none"
         autoComplete="off"
         autoCapitalize="characters"
         spellCheck={false}
