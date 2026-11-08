@@ -151,6 +151,23 @@ input:disabled,
   background: var(--surface-hover);
 }
 
+.tile-cell {
+  width: var(--cell-size, 2.5rem);
+  height: var(--cell-size, 2.5rem);
+  border-radius: var(--cell-radius, 0.5rem);
+  font-size: var(--cell-font-size, 1rem);
+  transition: width 0.15s ease, height 0.15s ease, font-size 0.15s ease;
+}
+
+@media (min-width: 640px) {
+  .tile-cell {
+    width: var(--cell-size-sm, var(--cell-size, 2.75rem));
+    height: var(--cell-size-sm, var(--cell-size, 2.75rem));
+    border-radius: var(--cell-radius-sm, var(--cell-radius, 0.5rem));
+    font-size: var(--cell-font-size-sm, var(--cell-font-size, 1.125rem));
+  }
+}
+
 .tile {
   border: 2px solid var(--tile-empty-border);
   background: var(--tile-empty);

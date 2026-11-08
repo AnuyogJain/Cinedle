@@ -104,16 +104,99 @@ export function DraftGuessRow({
   );
 }
 
-function WordFlowShell({ children }: { children: ReactNode }) {
+export function getTileMetrics(wordLengths: number[]) {
+  const maxLen = wordLengths.length > 0 ? Math.max(...wordLengths) : 5;
+
+  if (maxLen <= 8) {
+    return {
+      cellSize: 40,
+      cellSizeSm: 44,
+      fontSize: 16,
+      fontSizeSm: 18,
+      gap: 4,
+      gapSm: 4,
+      radius: 8,
+      radiusSm: 8,
+    };
+  }
+
+  // Safe width on standard mobile viewports (e.g. 360px - 390px minus container padding)
+  const targetMobileWidth = 316;
+  const mobileGap = maxLen >= 11 ? 2 : 3;
+  const calculatedMobileSize = Math.floor(
+    (targetMobileWidth - (maxLen - 1) * mobileGap) / maxLen
+  );
+  const cellSize = Math.min(40, Math.max(18, calculatedMobileSize));
+  const fontSize = Math.max(10, Math.round(cellSize * 0.46));
+  const radius = cellSize < 28 ? 5 : 6;
+
+  // On desktop / sm breakpoint, allow up to 460px width
+  const targetDesktopWidth = 460;
+  const desktopGap = maxLen >= 11 ? 3 : 4;
+  const calculatedDesktopSize = Math.floor(
+    (targetDesktopWidth - (maxLen - 1) * desktopGap) / maxLen
+  );
+  const cellSizeSm = Math.min(44, Math.max(24, calculatedDesktopSize));
+  const fontSizeSm = Math.max(12, Math.round(cellSizeSm * 0.45));
+  const radiusSm = cellSizeSm < 32 ? 6 : 8;
+
+  return {
+    cellSize,
+    cellSizeSm,
+    fontSize,
+    fontSizeSm,
+    gap: mobileGap,
+    gapSm: desktopGap,
+    radius,
+    radiusSm,
+  };
+}
+
+function WordFlowShell({
+  children,
+  wordLengths,
+}: {
+  children: ReactNode;
+  wordLengths?: number[];
+}) {
+  const metrics = wordLengths ? getTileMetrics(wordLengths) : null;
+  const maxLen =
+    wordLengths && wordLengths.length > 0 ? Math.max(...wordLengths) : 0;
+  const isCompact = maxLen > 8;
+
+  const style = metrics
+    ? ({
+        "--cell-size": `${metrics.cellSize}px`,
+        "--cell-size-sm": `${metrics.cellSizeSm}px`,
+        "--cell-font-size": `${metrics.fontSize}px`,
+        "--cell-font-size-sm": `${metrics.fontSizeSm}px`,
+        "--cell-gap": `${metrics.gap}px`,
+        "--cell-gap-sm": `${metrics.gapSm}px`,
+        "--cell-radius": `${metrics.radius}px`,
+        "--cell-radius-sm": `${metrics.radiusSm}px`,
+      } as React.CSSProperties)
+    : undefined;
+
   return (
-    <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-x-5 gap-y-2.5 px-0.5 sm:gap-x-6">
+    <div
+      style={style}
+      className={`flex w-full max-w-full flex-wrap items-center justify-center px-0.5 ${
+        isCompact
+          ? "gap-x-3 gap-y-2 sm:gap-x-5 sm:gap-y-2.5"
+          : "gap-x-5 gap-y-2.5 sm:gap-x-6"
+      }`}
+    >
       {children}
     </div>
   );
 }
 
 function WordTileGroup({ children }: { children: ReactNode }) {
-  return <div className="flex shrink-0 gap-1">{children}</div>;
+  return (
+    <div className="flex shrink-0 gap-[var(--cell-gap,0.25rem)] sm:gap-[var(--cell-gap-sm,0.25rem)]">
+      {children}
+    </div>
+  );
 }
 
 function GuessLine({
@@ -124,7 +207,7 @@ function GuessLine({
   row: GuessRow;
 }) {
   return (
-    <WordFlowShell>
+    <WordFlowShell wordLengths={wordLengths}>
       {wordLengths.map((len, wi) => (
         <WordTileGroup key={`w-${wi}`}>
           {Array.from({ length: len }).map((_, li) => {
@@ -166,7 +249,7 @@ function DraftLine({
   onSubmit: () => void;
 }) {
   return (
-    <WordFlowShell>
+    <WordFlowShell wordLengths={wordLengths}>
       {wordLengths.map((len, wi) => (
         <WordTileGroup key={`dw-${wi}`}>
           {Array.from({ length: len }).map((_, li) => {
@@ -222,7 +305,7 @@ const DraftCell = forwardRef(function DraftCell(
 
   return (
     <div
-      className={`relative flex h-10 w-10 items-center justify-center rounded-lg sm:h-11 sm:w-11 ${draftTileClass(
+      className={`tile-cell relative flex shrink-0 items-center justify-center ${draftTileClass(
         hasLetter,
         isActive
       )}`}
@@ -238,7 +321,8 @@ const DraftCell = forwardRef(function DraftCell(
         disabled={disabled}
         value={letter}
         maxLength={1}
-        className="absolute inset-0 z-10 cursor-text rounded-lg bg-transparent text-center text-base font-bold uppercase text-foreground caret-transparent outline-none disabled:cursor-default"
+        className="absolute inset-0 z-10 cursor-text rounded-[inherit] bg-transparent text-center font-bold uppercase text-foreground caret-transparent outline-none disabled:cursor-default"
+        style={{ fontSize: "inherit" }}
         onFocus={onFocus}
         onChange={(e) => {
           const raw = e.target.value;
@@ -259,9 +343,10 @@ const DraftCell = forwardRef(function DraftCell(
         }}
       />
       <span
-        className={`pointer-events-none text-base font-bold uppercase ${
+        className={`pointer-events-none font-bold uppercase ${
           hasLetter ? "text-foreground" : "text-transparent"
         }`}
+        style={{ fontSize: "inherit" }}
       >
         {letter}
       </span>
@@ -272,7 +357,7 @@ const DraftCell = forwardRef(function DraftCell(
 function StaticCell({ letter, state }: { letter: string; state: CellState }) {
   return (
     <span
-      className={`flex h-10 w-10 items-center justify-center rounded-lg text-base font-bold uppercase sm:h-11 sm:w-11 ${tileClass(
+      className={`tile-cell flex shrink-0 items-center justify-center font-bold uppercase ${tileClass(
         state
       )}`}
     >
