@@ -4,8 +4,8 @@
   "description": "Daily movie title puzzle — cinema-themed Wordle for film buffs",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0f",
-  "theme_color": "#f5c518",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
