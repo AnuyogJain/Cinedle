@@ -15,6 +15,8 @@ export interface StoredProgress {
   updatedAt: string;
   revealTitle?: string;
   revealYear?: number;
+  revealTmdbId?: number;
+  revealPosterPath?: string | null;
 }
 
 export type ProgressMap = Record<string, StoredProgress>;

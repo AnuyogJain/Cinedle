@@ -2,9 +2,8 @@
 
 import { Clapperboard, ExternalLink, Sparkles, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useCineswipeAppUrl } from "@/components/CineswipeAppUrlProvider";
 import { posterUrl } from "@/lib/images";
-import { buildCineswipeMovieHref } from "@/lib/cineswipe";
+import { buildLetterboxdMovieUrl } from "@/lib/letterboxd";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,32 +31,16 @@ export function WinModal({
   tmdbId: number | null;
   onClose: () => void;
 }) {
-  const cineswipeAppUrl = useCineswipeAppUrl();
   const [posterFailed, setPosterFailed] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     if (open) setPosterFailed(false);
   }, [open, posterPath]);
 
-  useEffect(() => {
-    if (!open) return;
-    setAuthChecked(false);
-    fetch("/api/auth/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => setLoggedIn(Boolean(data?.user)))
-      .catch(() => setLoggedIn(false))
-      .finally(() => setAuthChecked(true));
-  }, [open]);
-
   const poster = posterPath && !posterFailed ? posterUrl(posterPath) : null;
   const guessLabel = `${guessCount} ${guessCount === 1 ? "guess" : "guesses"}`;
 
-  const cineswipeHref =
-    cineswipeAppUrl && tmdbId != null && tmdbId > 0
-      ? buildCineswipeMovieHref(cineswipeAppUrl, tmdbId, loggedIn)
-      : null;
+  const letterboxdHref = buildLetterboxdMovieUrl({ tmdbId, title, year });
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -136,26 +119,26 @@ export function WinModal({
         </div>
 
         <div className="space-y-2 border-t border-border/50 bg-glass/30 px-6 py-4">
-          {cineswipeAppUrl && tmdbId != null && tmdbId > 0 ? (
+          {letterboxdHref ? (
             <Button
               variant="outline"
               size="lg"
-              className="w-full gap-2"
-              disabled={!authChecked || !cineswipeHref}
-              asChild={Boolean(cineswipeHref && authChecked)}
+              className="w-full gap-2 font-semibold"
+              asChild
             >
-              {cineswipeHref && authChecked ? (
-                <a
-                  href={cineswipeHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View on CineSwipe
-                  <ExternalLink className="h-4 w-4" aria-hidden />
-                </a>
-              ) : (
-                <>View on CineSwipe</>
-              )}
+              <a
+                href={letterboxdHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span className="mr-0.5 flex items-center -space-x-1" aria-hidden>
+                  <span className="h-2 w-2 rounded-full bg-[#ff8000]" />
+                  <span className="h-2 w-2 rounded-full bg-[#00e054]" />
+                  <span className="h-2 w-2 rounded-full bg-[#40bcf4]" />
+                </span>
+                <span>View on Letterboxd</span>
+                <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden />
+              </a>
             </Button>
           ) : null}
           <Button

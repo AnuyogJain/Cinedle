@@ -39,6 +39,7 @@ interface PuzzleView {
   date: string | null;
   wordLengths: number[];
   letterCounts: Record<string, number>;
+  tmdbId?: number;
 }
 
 interface FilterQuery {
@@ -133,8 +134,8 @@ export function GamePlay({
           setReveal({
             displayTitle: local.revealTitle,
             year: local.revealYear ?? 0,
-            posterPath: null,
-            tmdbId: null,
+            posterPath: local.revealPosterPath ?? null,
+            tmdbId: local.revealTmdbId ?? puzzleData.tmdbId ?? null,
           });
 
           const last = local.guesses[local.guesses.length - 1];
@@ -165,6 +166,8 @@ export function GamePlay({
                 ...local,
                 revealTitle: gradeData.reveal.displayTitle,
                 revealYear: gradeData.reveal.year,
+                revealTmdbId: gradeData.reveal.tmdbId ?? puzzleData.tmdbId,
+                revealPosterPath: gradeData.reveal.posterPath,
               });
             }
           }
@@ -214,11 +217,13 @@ export function GamePlay({
         updatedAt: new Date().toISOString(),
         revealTitle: revealData?.displayTitle,
         revealYear: revealData?.year,
+        revealTmdbId: revealData?.tmdbId ?? puzzle?.tmdbId,
+        revealPosterPath: revealData?.posterPath,
       };
       upsertLocalProgress(entry);
       void persistEntryToServer(entry);
     },
-    [puzzle?.mode, puzzleKey]
+    [puzzle?.mode, puzzle?.tmdbId, puzzleKey]
   );
 
   const submitGuess = useCallback(async () => {
@@ -448,7 +453,7 @@ export function GamePlay({
         title={reveal?.displayTitle ?? ""}
         year={reveal?.year ?? 0}
         posterPath={reveal?.posterPath ?? null}
-        tmdbId={reveal?.tmdbId ?? null}
+        tmdbId={reveal?.tmdbId ?? puzzle?.tmdbId ?? null}
         onClose={() => setReveal(null)}
       />
     </div>
