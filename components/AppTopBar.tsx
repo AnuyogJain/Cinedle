@@ -14,10 +14,12 @@ export function AppTopBar({
   backHref,
   subtitle,
   trailing,
+  leading,
 }: {
   backHref?: string;
   subtitle?: string;
   trailing?: ReactNode;
+  leading?: ReactNode;
 }) {
   return (
     <header className="app-top-bar glass-panel sticky top-0 z-20 -mx-4 mb-4 shrink-0 border-x-0 border-t-0 px-2 pt-[env(safe-area-inset-top,0px)] shadow-lg shadow-black/20">
@@ -35,6 +37,7 @@ export function AppTopBar({
               </Link>
             </Button>
           ) : null}
+          {leading}
         </div>
 
         <div

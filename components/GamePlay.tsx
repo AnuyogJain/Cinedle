@@ -27,6 +27,7 @@ import { GameHeader } from "./GameHeader";
 import { mergeKeyboardHints } from "@/lib/keyboard-hints";
 import { GameKeyboard } from "./GameKeyboard";
 import { HowToPlayModal } from "./HowToPlayModal";
+import { SharePuzzleModal } from "./SharePuzzleModal";
 import { DraftGuessRow, SubmittedGuessLine, type GuessRow } from "./PuzzleGrid";
 import { PuzzleLoadError } from "./PuzzleLoadError";
 import { WinModal } from "./WinModal";
@@ -63,6 +64,7 @@ export function GamePlay({
     code?: PuzzleErrorCode | string;
   } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [submitted, setSubmitted] = useState<GuessRow[]>([]);
   const [draftGrid, setDraftGrid] = useState<DraftGrid>([]);
   const [activeWordIndex, setActiveWordIndex] = useState(0);
@@ -344,9 +346,16 @@ export function GamePlay({
         <GameHeader
           backHref={backHref}
           onHelp={() => setHelpOpen(true)}
+          onShare={() => setShareOpen(true)}
           subtitle={subtitle}
         />
         <p className="py-20 text-center text-sm text-muted">Loading puzzle…</p>
+        <SharePuzzleModal
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          puzzleKey={puzzleKey}
+          subtitle={subtitle}
+        />
       </div>
     );
   }
@@ -357,6 +366,7 @@ export function GamePlay({
         <GameHeader
           backHref={backHref}
           onHelp={() => setHelpOpen(true)}
+          onShare={() => setShareOpen(true)}
           subtitle={subtitle}
         />
         <PuzzleLoadError
@@ -369,6 +379,12 @@ export function GamePlay({
           onRetry={() => void loadPuzzle()}
         />
         <HowToPlayModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+        <SharePuzzleModal
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          puzzleKey={puzzleKey}
+          subtitle={subtitle}
+        />
       </div>
     );
   }
@@ -378,6 +394,7 @@ export function GamePlay({
       <GameHeader
         backHref={backHref}
         onHelp={() => setHelpOpen(true)}
+        onShare={() => setShareOpen(true)}
         subtitle={subtitle}
       />
       <main
@@ -419,6 +436,12 @@ export function GamePlay({
         </div>
       </main>
       <HowToPlayModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <SharePuzzleModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        puzzleKey={puzzleKey}
+        subtitle={subtitle}
+      />
       <WinModal
         open={won && reveal != null}
         guessCount={submitted.length}
