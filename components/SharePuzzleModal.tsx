@@ -78,7 +78,7 @@ export function SharePuzzleModal({
       try {
         await navigator.share({
           title: "Cinedle — Daily Movie Title Puzzle",
-          text: `Can you guess the movie title in today's Cinedle? 🎬🍿`,
+          text: `Can you guess the movie title? 🎬🍿`,
           url: shareUrl,
         });
         return;
@@ -145,11 +145,10 @@ export function SharePuzzleModal({
               type="button"
               size="sm"
               onClick={copyToClipboard}
-              className={`shrink-0 font-semibold transition-all ${
-                copied
+              className={`shrink-0 font-semibold transition-all ${copied
                   ? "bg-emerald-600 text-white hover:bg-emerald-600"
                   : "btn-cta bg-primary text-primary-foreground hover:bg-primary/90"
-              }`}
+                }`}
             >
               {copied ? (
                 <>
