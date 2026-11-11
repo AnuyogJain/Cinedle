@@ -131,11 +131,13 @@ export function WinModal({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span className="mr-0.5 flex items-center -space-x-1" aria-hidden>
-                  <span className="h-2 w-2 rounded-full bg-[#ff8000]" />
-                  <span className="h-2 w-2 rounded-full bg-[#00e054]" />
-                  <span className="h-2 w-2 rounded-full bg-[#40bcf4]" />
-                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/letterboxd-icon.png"
+                  alt="Letterboxd"
+                  className="h-5 w-5 shrink-0 object-contain"
+                  aria-hidden
+                />
                 <span>View on Letterboxd</span>
                 <ExternalLink className="h-4 w-4 text-muted-foreground" aria-hidden />
               </a>
