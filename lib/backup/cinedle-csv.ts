@@ -56,13 +56,14 @@ export async function importUserBackupCsvReplace(csvText: string): Promise<void>
   const userId = requestUserId();
   await db.delete(gameProgress).where(forUser(gameProgress));
 
+  const rowsToInsert: (typeof gameProgress.$inferInsert)[] = [];
   for (const row of parsed.data) {
     if (row.record_type !== "progress") continue;
     const puzzleKey = row.puzzle_key?.trim();
     if (!puzzleKey) continue;
     const mode = row.mode === "unlimited" ? "unlimited" : "daily";
     const revealYearRaw = row.reveal_year?.trim();
-    await db.insert(gameProgress).values({
+    rowsToInsert.push({
       userId,
       puzzleKey,
       mode,
@@ -74,5 +75,10 @@ export async function importUserBackupCsvReplace(csvText: string): Promise<void>
       completedAt: row.completed_at ? new Date(row.completed_at) : null,
       updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
     });
+  }
+
+  const CHUNK_SIZE = 50;
+  for (let i = 0; i < rowsToInsert.length; i += CHUNK_SIZE) {
+    await db.insert(gameProgress).values(rowsToInsert.slice(i, i + CHUNK_SIZE));
   }
 }

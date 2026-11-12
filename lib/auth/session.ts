@@ -37,10 +37,20 @@ export async function createSession(userId: string): Promise<string> {
   return id;
 }
 
+interface CachedSession {
+  user: SessionUser;
+  cachedAt: number;
+}
+
+const sessionUserCache = new Map<string, CachedSession>();
+const SESSION_CACHE_TTL_MS = 60 * 1000; // 60s
+const MAX_SESSION_CACHE_SIZE = 1000;
+
 export async function destroySession(): Promise<void> {
   const jar = await cookies();
-  const token = jar.get(SESSION_COOKIE)?.value;
+  const token = jar.get(SESSION_COOKIE)?.value?.trim();
   if (token) {
+    sessionUserCache.delete(token);
     await db.delete(sessions).where(eq(sessions.id, token));
   }
   jar.set(SESSION_COOKIE, "", { ...cookieOptions(0), maxAge: 0 });
@@ -51,7 +61,13 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   const token = jar.get(SESSION_COOKIE)?.value?.trim();
   if (!token) return null;
 
-  const now = new Date();
+  const nowMs = Date.now();
+  const cached = sessionUserCache.get(token);
+  if (cached && nowMs - cached.cachedAt < SESSION_CACHE_TTL_MS) {
+    return cached.user;
+  }
+
+  const now = new Date(nowMs);
   const rows = await db
     .select({
       sessionId: sessions.id,
@@ -65,11 +81,22 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     .limit(1);
 
   const row = rows[0];
-  if (!row) return null;
+  if (!row) {
+    sessionUserCache.delete(token);
+    return null;
+  }
 
-  return {
+  const user: SessionUser = {
     id: row.userId,
     displayName: row.displayName,
     username: row.username,
   };
+
+  if (sessionUserCache.size >= MAX_SESSION_CACHE_SIZE) {
+    const firstKey = sessionUserCache.keys().next().value;
+    if (firstKey) sessionUserCache.delete(firstKey);
+  }
+  sessionUserCache.set(token, { user, cachedAt: nowMs });
+
+  return user;
 }

@@ -28,15 +28,35 @@ function rowToPoolMovie(
   };
 }
 
+const assignmentCache = new Map<string, PoolMovie>();
+const MAX_ASSIGNMENT_CACHE_SIZE = 500;
+
+function setCachedAssignment(assignmentKey: string, movie: PoolMovie): void {
+  if (assignmentCache.size >= MAX_ASSIGNMENT_CACHE_SIZE) {
+    const firstKey = assignmentCache.keys().next().value;
+    if (firstKey) assignmentCache.delete(firstKey);
+  }
+  assignmentCache.set(assignmentKey, movie);
+}
+
 async function loadAssignment(
   assignmentKey: string,
 ): Promise<PoolMovie | null> {
+  const cached = assignmentCache.get(assignmentKey);
+  if (cached) return cached;
+
   const row = await db
     .select()
     .from(puzzleAssignments)
     .where(eq(puzzleAssignments.assignmentKey, assignmentKey))
     .then((rows) => rows[0]);
-  return row ? rowToPoolMovie(row) : null;
+
+  if (row) {
+    const movie = rowToPoolMovie(row);
+    setCachedAssignment(assignmentKey, movie);
+    return movie;
+  }
+  return null;
 }
 
 async function recentDailyTmdbIds(): Promise<Set<number>> {
@@ -106,6 +126,7 @@ export async function getOrCreateAssignment(
         genreIdsJson: JSON.stringify(movie.genreIds),
         originCountry: movie.originCountry,
       });
+      setCachedAssignment(assignmentKey, movie);
       return movie;
     } catch {
       const raced = await loadAssignment(assignmentKey);
